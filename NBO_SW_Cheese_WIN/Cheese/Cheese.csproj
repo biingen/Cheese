@@ -101,9 +101,18 @@
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\Data_Conversion.cs" />
-    <Compile Include="Modules\MCCS\Capabilities.cs" />
-    <Compile Include="Modules\MCCS\Feature.cs" />
-    <Compile Include="Modules\MCCS\WinNativeMethods.cs" />
+    <Compile Include="Modules\FtI2C\FT2232_Lib.cs" />
+    <Compile Include="Modules\FtI2C\FtChannelConfig.cs" />
+    <Compile Include="Modules\FtI2C\FtConfigOptions.cs" />
+    <Compile Include="Modules\FtI2C\FtDeviceInfo.cs" />
+    <Compile Include="Modules\FtI2C\FtI2cTransferOptions.cs" />
+    <Compile Include="Modules\FtI2C\FtResult.cs" />
+    <Compile Include="Modules\FtI2C\FtSpiTransferOptions.cs" />
+    <Compile Include="Modules\FtI2C\Ft_I2C_ChannelConfig.cs" />
+    <Compile Include="Modules\FtI2C\Ft_I2C_ClockRate.cs" />
+    <Compile Include="Modules\Mccs\Capabilities.cs" />
+    <Compile Include="Modules\Mccs\Feature.cs" />
+    <Compile Include="Modules\Mccs\WinNativeMethods.cs" />
     <Compile Include="Modules\Mod_RS232.cs" />
     <Compile Include="Modules\Socket\TCPIP_Server.cs" />
     <Compile Include="MonitorControl.cs" />
@@ -194,7 +203,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 和 x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -205,6 +214,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectDir)\log4net.config" "$(ProjectDir)bin\Debug\"</PostBuildEvent>
+    <PostBuildEvent>copy "$(ProjectDir)DLL\log4net.config" "$(ProjectDir)bin\Debug\"
+copy "$(ProjectDir)DLL\libMPSSE.*" "$(ProjectDir)bin\Debug\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

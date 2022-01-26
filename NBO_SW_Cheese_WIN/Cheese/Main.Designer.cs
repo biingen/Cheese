@@ -78,6 +78,8 @@
             this.BTN_Stop = new System.Windows.Forms.Button();
             this.BTN_Pause = new System.Windows.Forms.Button();
             this.BTN_StartTest = new System.Windows.Forms.Button();
+            this.PIC_FTDI = new System.Windows.Forms.PictureBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
@@ -86,6 +88,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.PIC_NetworkStatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_CurrentStatus)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PIC_ComPortStatus)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PIC_FTDI)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -588,11 +591,32 @@
             this.BTN_StartTest.UseVisualStyleBackColor = true;
             this.BTN_StartTest.Click += new System.EventHandler(this.BTN_StartTest_Click);
             // 
+            // PIC_FTDI
+            // 
+            this.PIC_FTDI.Image = global::Cheese.ImageResource.BlackLED;
+            this.PIC_FTDI.Location = new System.Drawing.Point(454, 43);
+            this.PIC_FTDI.Name = "PIC_FTDI";
+            this.PIC_FTDI.Size = new System.Drawing.Size(20, 20);
+            this.PIC_FTDI.TabIndex = 40;
+            this.PIC_FTDI.TabStop = false;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(473, 42);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(85, 19);
+            this.label4.TabIndex = 39;
+            this.label4.Text = "FTDI Status";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1194, 692);
+            this.Controls.Add(this.PIC_FTDI);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.button_Snapshot);
             this.Controls.Add(this.button_AcOff);
             this.Controls.Add(this.button_AcOn);
@@ -632,6 +656,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.PIC_NetworkStatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_CurrentStatus)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PIC_ComPortStatus)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PIC_FTDI)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -689,6 +714,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
+        private System.Windows.Forms.PictureBox PIC_FTDI;
+        private System.Windows.Forms.Label label4;
     }
 }
 

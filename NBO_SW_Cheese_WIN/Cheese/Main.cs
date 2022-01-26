@@ -23,6 +23,7 @@ using AForge.Controls;
 using AForge.Video.DirectShow;
 using AForge.Video;
 using jini;
+using Universal_Toolkit.Types;
 
 namespace Cheese
 {
@@ -70,11 +71,11 @@ namespace Cheese
         // ----------------------------------------------------------------------------------------------- //
         public Main()
         {
-            log.Info("Main");
+            log.Debug("Main");
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 000.000.001";
+            this.VerLabel.Text = "Version: 000.000.002";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -116,6 +117,18 @@ namespace Cheese
             else
             {
                 this.PIC_NetworkStatus.Image = ImageResource.BlackLED;
+            }
+        }
+        public void Form1UpdateFTDILedStatus(int status)
+        {
+            log.Debug("Form1UpdateFTDILedStatus: " + status);
+            if (status == 1)
+            {
+                this.PIC_FTDI.Image = ImageResource.GleenLed;
+            }
+            else
+            {
+                this.PIC_FTDI.Image = ImageResource.BlackLED;
             }
         }
 
@@ -292,7 +305,7 @@ namespace Cheese
         //private void UpdateLoopTxt(int Cmd, ref int result)
         private void UpdateLoopTxt(int Cmd, int valueOfLoop)
         {
-            log.Info("UpdateLoopTxt: " + Cmd + ", " + valueOfLoop);
+            log.Debug("UpdateLoopTxt: " + Cmd + ", " + valueOfLoop);
             if (Cmd == 0)
             {
                 this.Txt_LoopTimes.Enabled = false;
@@ -442,7 +455,7 @@ namespace Cheese
             Setting form2 = new Setting();
             string resultLine = "";
             string cmdString = "";
-            string[] CmdStringArray = new string[100];
+            string[] CmdStringArray = new string[128];
             string[] tempStr = new string[100];
             byte[] Cmdbuf = new byte[100];
             byte[] retBuf = new byte[100];
@@ -537,12 +550,12 @@ namespace Cheese
                         if ((columns_command == "_shot") || (columns_command == "PHOTO") || (columns_command == "photo"))
                         {
                             int camSelectMode = 0;
-                            byte[] decodeFromStr = new byte[2];
-                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
+                            //byte[] decodeFromStr = new byte[2];
+                            //decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                             if (columns_subFunction == "all" || columns_subFunction == "")
                                 camSelectMode = -1;
-                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                            else if (columns_subFunction != "")// && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
                                 camSelectMode = Convert.ToInt32(columns_subFunction);
 
                             if (videoDevices.Count >= 1)
@@ -850,12 +863,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
                                             
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -931,12 +942,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1009,12 +1018,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1087,12 +1094,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1164,12 +1169,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1241,12 +1244,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1318,12 +1319,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1395,12 +1394,10 @@ namespace Cheese
                                         else if (columns_cmdLine == "_shot")
                                         {
                                             int cameraIdx = 0;
-                                            byte[] decodeFromStr = new byte[2];
-                                            decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (columns_subFunction != "" && decodeFromStr[0] > 0x30 && decodeFromStr[0] < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1462,10 +1459,10 @@ namespace Cheese
                             }
                         }
                         #endregion
-						#region -- Schedule for VCP Command --
+						#region -- Schedule for DDC/CI --
                         else if ((columns_command == "_MCCS"))
                         {
-                            log.Info("Enter schedule of " + columns_command);
+                            log.Debug("Enter schedule of " + columns_command);
                             byte byteValue = 0x00;
                             
                             if (columns_function == "Auto")
@@ -1486,7 +1483,7 @@ namespace Cheese
                                             var vcpCodeByte = monControlSet.Capabilities.VCPCodes.Keys.ElementAt(ii);
                                             var vcpCodeValue = monControlSet.Capabilities.VCPCodes.Values.ElementAt(ii);
 
-                                            if (vcpCodeByte >= 0x10 && vcpCodeByte < 0xD6)  //10h: Luminance; D6h: Power Mode
+                                            if (vcpCodeByte >= 0x10 && vcpCodeByte < 0xFF && vcpCodeByte != 0xD6 && vcpCodeByte != 0x60)  //10h: Luminance; D6h: Power Mode
                                             {
                                                 if (vcpCodeValue.PossibleValues.Count > 0)
                                                 {
@@ -1536,7 +1533,7 @@ namespace Cheese
                                     }
                                     catch (Exception exc)
                                     {
-                                        MessageBox.Show(exc.ToString(), "Schedule");
+                                        MessageBox.Show(exc.ToString(), "DDCCI");
                                     }
                                 }
                                 else
@@ -1558,13 +1555,126 @@ namespace Cheese
                                 brVal.Remove(fea_vi);
                             }
 
-                            log.Info("Leave schedule of " + columns_command);
+                            log.Debug("Leave schedule of " + columns_command);
                             if (!monControlSets[0].Handle.IsClosed)
                                 monControlSets[0].Handle.Close();
                             else if (!monControlSets[1].Handle.IsClosed)
                                 monControlSets[1].Handle.Close();
 
                             Thread.Sleep(Convert.ToInt32(this.dataGridView1.Rows[ExeIndex].Cells[8].Value));
+                        }
+                        #endregion
+						#region -- FTDI Read/Write --
+                        else if (columns_command == "_FTDI")
+                        {
+                            if (GlobalData.portinfo.ftStatus == FtResult.Ok)
+                            {
+                                if (columns_function == "Write" && columns_cmdLine != "")
+                                {
+                                    //log.Debug("FTDI Write Log: _FTDI_Write");
+                                    int packetLen = columns_cmdLine.Split(' ').Count();
+                                    byte[] cmdBytes = new byte[packetLen + 1];     //Plus 1 is reserved for checksum Byte
+                                    var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
+                                    byte DeviceAddr = cmdBytes[0];
+                                    byte[] DeviceData = new byte[packetLen];
+                                    Array.Copy(cmdBytes, 1, DeviceData, 0, packetLen);
+                                    
+                                    GlobalData.Ftdi_lib.I2C_SEQ_Write(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData);
+                                    resultLine = "";
+                                    for (int index = 0; index < packetLen; index++)
+                                    {
+                                        resultLine += DeviceData[index].ToString("X2");
+                                        if (index != (packetLen - 1))
+                                            resultLine += " ";
+                                    }
+                                    log.Info($"[FTDI-Write] {DeviceAddr:X2} {resultLine}_:_{columns_remark}");
+                                }
+                                else if (columns_function == "Read" && columns_cmdLine != "")
+                                {
+                                    //log.Debug("FTDI Write Log: _FTDI_Read");
+                                    int packetLen = columns_cmdLine.Split(' ').Count();
+                                    byte recLength = 0x00;
+                                    byte[] readBytes = new byte[128];
+                                    byte[] cmdBytes = new byte[packetLen + 1];     //Plus 1 is reserved for checksum Byte
+                                    var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
+                                    byte DeviceAddr = cmdBytes[0];
+                                    byte[] DeviceData = new byte[packetLen];
+                                    Array.Copy(cmdBytes, 1, DeviceData, 0, packetLen);
+                                    resultLine = "";
+                                    for (int index = 0; index < packetLen; index++)
+                                    {
+                                        resultLine += cmdBytes[index].ToString("X2");
+                                        if (index != (packetLen - 1))
+                                            resultLine += " ";
+                                    }
+                                    log.Info($"[FTDI-Read] {resultLine}");
+                                    if (GlobalData.Ftdi_lib.I2C_SEQ_Read(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData, readBytes, out recLength) == FtResult.Ok)
+                                    {
+                                        byte[] tmpBytes = new byte[recLength];
+                                        byte chkInPacket = readBytes[recLength - 1];
+                                        Array.Copy(readBytes, tmpBytes, recLength);
+                                        string calculateLine = "";
+                                        resultLine = "";
+                                        
+                                        for (int index = 0; index < recLength; index++)
+                                        {
+                                            if (index != (recLength - 1))
+                                            {
+                                                resultLine += tmpBytes[index].ToString("X2");
+                                                resultLine += " ";
+                                            }
+                                            else
+                                            {
+                                                calculateLine = resultLine + "50";
+                                                resultLine += tmpBytes[index].ToString("X2");
+                                            }
+                                        }
+                                        
+                                        dataConv.XOR8_BytesWithChksum(calculateLine, tmpBytes, recLength);
+                                        if (chkInPacket != tmpBytes[recLength - 1])
+                                            log.Info($"[FTDI-Reply] Checksum is incorrect!!");
+                                            //MessageBox.Show("Ftdi_Port_Receive no data !!", "The checksum error!!");
+
+                                        log.Info($"[FTDI-Reply] {resultLine}_:_{columns_remark}");
+                                    }
+                                }
+
+                                Thread.Sleep(Convert.ToInt32(this.dataGridView1.Rows[ExeIndex].Cells[8].Value));
+                            }
+                        }
+                        #endregion
+                        #region -- DOS command --
+                        else if (columns_command == "_DOS")
+                        {
+                            log.Debug("DOS command: _DOS");
+                            if (columns_cmdLine != "")
+                            {
+                                string Command = columns_cmdLine;
+
+                                System.Diagnostics.Process p = new Process();
+                                p.StartInfo.FileName = "cmd.exe";
+                                p.StartInfo.WorkingDirectory = GlobalData.Dos_Path;
+                                p.StartInfo.UseShellExecute = false;
+                                p.StartInfo.RedirectStandardInput = true;
+                                p.StartInfo.RedirectStandardOutput = true;
+                                p.StartInfo.RedirectStandardError = true;
+                                p.StartInfo.CreateNoWindow = true; //不跳出cmd視窗
+                                string strOutput = null;
+
+                                try
+                                {
+                                    p.Start();
+                                    p.StandardInput.WriteLine(Command);
+                                    //p.StandardInput.WriteLine("exit");
+                                    //strOutput = p.StandardOutput.ReadToEnd();//匯出整個執行過程
+                                    //p.WaitForExit();
+                                    //p.Close();
+                                }
+                                catch (Exception e)
+                                {
+                                    strOutput = e.Message;
+                                }
+                            }
                         }
                         #endregion
 
@@ -2420,6 +2530,19 @@ namespace Cheese
                 ArduinoLED.Invoke(1);
             else
                 ArduinoLED.Invoke(0);
+			
+            dUpdateUI FTDILED = new dUpdateUI(Form1UpdateFTDILedStatus);
+            if (GlobalData.FTDI_openFlag == true)
+            {
+                GlobalData.portinfo.I2C_Channel_Conf.ClockRate = Ft_I2C_ClockRate.I2C_CLOCK_STANDARD_MODE;
+                GlobalData.portinfo.I2C_Channel_Conf.LatencyTimer = 200;
+                GlobalData.portinfo.I2C_Channel_Conf.Options = 0x00000001;     //FtConfigOptions.I2C_DISABLE_3PHASE_CLOCKING;
+                GlobalData.portinfo.PortNum = 0;
+                GlobalData.portinfo.ftStatus = GlobalData.Ftdi_lib.I2C_Init(out GlobalData.portinfo.ftHandle, GlobalData.portinfo);
+                FTDILED.Invoke(1);
+            }
+            else
+                FTDILED.Invoke(0);
 
             this.Closing += new CancelEventHandler(Main_FormClosing);
         }
@@ -2832,30 +2955,28 @@ namespace Cheese
                     if (!NativeMethods.SetVCPFeature(spmHandle, featureCode, valueToBeSet))
                         throw new InvalidOperationException($"{nameof(NativeMethods.SetVCPFeature)} returned error {Marshal.GetLastWin32Error()}");
 
-                    log.Info($"[vcpCodeByte] {featureCode.ToString("X2")} [Value_Set] {valueToBeSet}");
+                    log.Info($"[vcpCodeByte] {featureCode:X2}h [Value_Set] {valueToBeSet}");
                 }
                 catch
                 {
-                    log.Warn($"VCPCode {featureCode.ToString("X2")}h is not supported!");
+                    log.Debug($" Cannot set the value for VCPCode {featureCode:X2}h!");   //{featureCode:X2} is simplified as {featureCode.ToString("X2")}
                 }
 
-                Task.Delay(2000).Wait();// (feature.Delay).Wait();
+                Task.Delay(2000).Wait();// Task.Delay(feature.Delay).Wait();
 
                 try
                 {
-
                     if (!NativeMethods.GetVCPFeatureAndVCPFeatureReply(spmHandle, featureCode, out pvct, out possibleVal, out maxVal))
                         throw new InvalidOperationException($"{nameof(NativeMethods.GetVCPFeatureAndVCPFeatureReply)} returned error {Marshal.GetLastWin32Error()}");
 
-                    log.Info($"[vcpCodeByte] {featureCode.ToString("X2")} [Value_get] {possibleVal} [MaxValue] {maxVal}");
+                    log.Info($"[vcpCodeByte] {featureCode:X2}h [Value_get] {possibleVal} [MaxValue] {maxVal}");
                 }
                 catch
                 {
-                    log.Warn("Something wrong when getting vcp values!");
+                    log.Debug("Cannot get the value for such vcpCode!");
                 }
             }
         }
-
         private static void SetMonitorFeatures(SafePhysicalMonitorHandle spmHandle, byte featureCode, uint valueToBeSet)
         {
             uint possibleVal = 0, maxVal = 0;
@@ -2866,11 +2987,11 @@ namespace Cheese
                 if (!NativeMethods.SetVCPFeature(spmHandle, featureCode, valueToBeSet))
                     throw new InvalidOperationException($"{nameof(NativeMethods.SetVCPFeature)} returned error {Marshal.GetLastWin32Error()}");
 
-                log.Info($"[vcpCodeByte] {featureCode.ToString("X2")} [Value_Set] {valueToBeSet}");
+                log.Info($"[vcpCodeByte] {featureCode:X2}h [Value_Set] {valueToBeSet}");
             }
             catch
             {
-                log.Warn($"VCPCode {featureCode.ToString("X2")}h is not supported!");
+                log.Debug($" Cannot set the value for VCPCode {featureCode:X2}h!");
                 //Console.WriteLine($"VCP code {featureCode.ToString()} is not supported!");
             }
 
@@ -2881,11 +3002,11 @@ namespace Cheese
                 if (!NativeMethods.GetVCPFeatureAndVCPFeatureReply(spmHandle, featureCode, out pvct, out possibleVal, out maxVal))
                     throw new InvalidOperationException($"{nameof(NativeMethods.GetVCPFeatureAndVCPFeatureReply)} returned error {Marshal.GetLastWin32Error()}");
 
-                log.Info($"[vcpCodeByte] {featureCode.ToString("X2")} [Value_get] {possibleVal} [MaxValue] {maxVal}");
+                log.Info($"[vcpCodeByte] {featureCode:X2}h [Value_get] {possibleVal} [MaxValue] {maxVal}");
             }
             catch
             {
-                log.Warn($"Something wrong when getting vcp values!");
+                log.Debug("Cannot get the value for such vcpCode!");
                 //Console.WriteLine($"Something wrong when getting vcp values!");
             }
         }
@@ -2932,6 +3053,6 @@ namespace Cheese
                 SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle, -1, -1);
             }
         }
-    }   //=== End of Main() ===//
 
+    }   //=== End of Main() ===//
 }

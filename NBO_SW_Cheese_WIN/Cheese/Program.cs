@@ -7,6 +7,8 @@ using System.Windows.Forms;
 using ModuleLayer;
 using log4net;
 using log4net.Config;
+using Universal_Toolkit;
+using Universal_Toolkit.Types;
 
 namespace Cheese
 {
@@ -49,11 +51,12 @@ namespace Cheese
         public static string MailSettingPath = Application.StartupPath + "\\Mail.ini";
         public static string RcSettingPath = Application.StartupPath + "\\RC.ini";
         public static string StartupPath = Application.StartupPath;
-        public static ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);        //log4net
 
         public static Mod_RS232 m_SerialPort = new Mod_RS232();
         public static Mod_RS232 sp_Arduino = new Mod_RS232();
-
+        public static FTDI_Lib Ftdi_lib = new FTDI_Lib();
+        public static PortInfo portinfo = new PortInfo();
+        public static ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);        //log4net
         //public static byte[] Cmdbuf = new byte[128];
         public static byte[] returnBytes = new byte[1024];
 
@@ -67,6 +70,8 @@ namespace Cheese
         public static bool Arduino_openFlag;
         public static bool Arduino_recFlag;
         public static bool GPIO = false;
+        public static bool FTDI_openFlag = false;
+        public static string Dos_Path = StartupPath;
         public static int IO_PA10_0_COUNT = 0;
         public static int IO_PA10_1_COUNT = 0;
         public static int IO_PA11_0_COUNT = 0;
