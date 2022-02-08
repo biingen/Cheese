@@ -246,6 +246,31 @@ namespace ModuleLayer
             else
                 return original_data_chksum;
         }
+
+        public byte[] StrToByte(string hexString)
+        {
+            string[] orginal_array = hexString.Split(' ');
+            byte[] orginal_bytes = new byte[orginal_array.Count()];
+            int orginal_index = 0;
+            try
+            {
+                foreach (string hex in orginal_array)
+                {
+                    // Convert the number expressed in base-16 to an integer.
+                    byte number = Convert.ToByte(Convert.ToInt32(hex, 16));
+                    // Get the character corresponding to the integral value.
+                    orginal_bytes[orginal_index++] = number;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is OverflowException || ex is FormatException)
+                {
+                    MessageBox.Show("Please check your schedule is in hexadecimal format.", "Format error");
+                }
+            }
+            return orginal_bytes;
+        }
     }
  
 }

@@ -607,7 +607,9 @@ namespace Cheese
                                 }
                                 else if (columns_function == "GENERAL")
                                 {
-                                    
+                                    byte[] cmdBytes = new byte[columns_cmdLine.Count()];
+                                    cmdBytes = dataConv.StrToByte(columns_cmdLine);
+                                    GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
                                 }
                             }
 
