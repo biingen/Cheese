@@ -75,7 +75,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 000.000.002";
+            this.VerLabel.Text = "Version: 00.00.003";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -587,6 +587,23 @@ namespace Cheese
                                 Thread.Sleep(Convert.ToInt32(this.dataGridView1.Rows[ExeIndex].Cells[8].Value));
                                 Cmdreceive = "";
                             }
+                        }
+                        #endregion
+                        #region -- Schedule for ASCII W/R --
+                        else if ((columns_command == "_ASCII") || (columns_command == "_ascii"))
+                        {
+                            GlobalData.m_SerialPort.WriteDataOut(columns_cmdLine, columns_cmdLine.Length);
+                            Thread.Sleep(50);
+                            Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedText);
+                            //GetSerialData(GlobalData.m_SerialPort_A);
+                            /*
+                            int numOfBytes = GlobalData.m_SerialPort_A.GetRxBytes();
+                            byte[] recBytes = new byte[numOfBytes];
+                            for (int i = 0; i < numOfBytes; i++)
+                            {
+                                recBytes[i] = GlobalData.m_SerialPort_A.GeneralDequeue();
+                            }*/
+                            Thread.Sleep(Convert.ToInt32(this.dataGridView1.Rows[ExeIndex].Cells[8].Value));
                         }
                         #endregion
                         #region -- Schedule for HEX W/R --
@@ -1519,7 +1536,7 @@ namespace Cheese
                                         break;
                                 }
                             }
-                            else if ((columns_function != "") && (columns_subFunction != ""))
+                            else if ((columns_function != "") && (columns_cmdLine != ""))
                             {
                                 monControlSets = MonitorControl.GetMonitors();
                                 byteValue = byte.Parse(columns_function, System.Globalization.NumberStyles.AllowHexSpecifier);
@@ -1529,9 +1546,9 @@ namespace Cheese
                                     try
                                     {
                                         if (byteValue == 0x60)
-                                            setValue = (uint)Enum.Parse(typeof(ModuleLayer.VideoInput), columns_subFunction);
+                                            setValue = (uint)Enum.Parse(typeof(ModuleLayer.VideoInput), columns_cmdLine);
                                         else
-                                            setValue = uint.Parse(columns_subFunction);
+                                            setValue = uint.Parse(columns_cmdLine);
                                     }
                                     catch (Exception exc)
                                     {
@@ -1544,7 +1561,7 @@ namespace Cheese
                                 SetMonitorFeatures(monControlSets[0].Handle, byteValue, setValue);
                                 //log.Debug("[vcpCodeByte] " + columns_function + " [Value_set] " + columns_subFunction);
                             }
-                            else if ((columns_function == "Brightness") && (columns_subFunction != ""))
+                            else if ((columns_function == "Brightness") && (columns_cmdLine != ""))
                             {
                                 Dictionary<FeatureRange, uint> brVal = new Dictionary<FeatureRange, uint>();
                                 Dictionary<Feature<ModuleLayer.VideoInput>, uint> tupleVal = new Dictionary<Feature<ModuleLayer.VideoInput>, uint>();
@@ -2129,7 +2146,7 @@ namespace Cheese
             dUpdateUI UINetworkLED = new dUpdateUI(Form1UpdateNetworkLedStatus);
             int ComportStatus;
             string PortNumber;
-            int BautRate, ParityBit, StopBit, DataLen;
+            int BaudRate, ParityBit, StopBit, DataLen;
             int NetworkStatus;
             string IP;
             int NetworkPort;
@@ -2147,18 +2164,19 @@ namespace Cheese
                 GlobalData.m_SerialPort.ClosePort();
                 UILED.Invoke(0);
             }
+            /*
             if (GlobalData.sp_Arduino.IsOpen())
             {
                 GlobalData.sp_Arduino.ClosePort();
                 ArduinoLED.Invoke(0);
-            }
+            }*/
 
             form2.ShowDialog(this);
             if (form2.DialogResult == System.Windows.Forms.DialogResult.OK)
             {
                 ComportStatus = form2.getComPortChecked();
                 PortNumber = form2.getComPortSetting();
-                BautRate = Convert.ToInt32(form2.getComPortBaudRate());
+                BaudRate = Convert.ToInt32(form2.getComPortBaudRate());
                 ParityBit = form2.getComPortParrityBit();
                 StopBit = form2.getComPortStopBit();
                 DataLen = form2.getComPortByteCount();
@@ -2171,14 +2189,14 @@ namespace Cheese
 
                 if (ComportStatus == 1)
                 {
-                    if (GlobalData.m_SerialPort.OpenPort(PortNumber, BautRate, ParityBit, DataLen, StopBit) >= 1)
+                    if (GlobalData.m_SerialPort.OpenPort(PortNumber, BaudRate, ParityBit, DataLen, StopBit) >= 1)
                     {
                         UILED.Invoke(1);
                     }
                     else
                     {
                         UILED.Invoke(0);
-                        MessageBox.Show("Open Port fail");
+                        MessageBox.Show("Fail to open ComPort!");
                     }
                 }
 
@@ -2211,12 +2229,13 @@ namespace Cheese
             }
             else if (form2.DialogResult == System.Windows.Forms.DialogResult.Cancel)
             {
+                /*
                 if (GlobalData.sp_Arduino.IsOpen())
                 {
                     GlobalData.sp_Arduino.OpenPort_Arduino(GlobalData.Arduino_Comport);
                     ArduinoLED.Invoke(0);
                 }
-
+                */
             }
         }
 
