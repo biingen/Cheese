@@ -2164,12 +2164,14 @@ namespace Cheese
                 GlobalData.m_SerialPort.ClosePort();
                 UILED.Invoke(0);
             }
+
             /*
             if (GlobalData.sp_Arduino.IsOpen())
             {
                 GlobalData.sp_Arduino.ClosePort();
                 ArduinoLED.Invoke(0);
-            }*/
+            }
+            */
 
             form2.ShowDialog(this);
             if (form2.DialogResult == System.Windows.Forms.DialogResult.OK)
@@ -2225,17 +2227,6 @@ namespace Cheese
                         MessageBox.Show("Open Socket fail.");
                     }
                 }
-                //ComPortHandle.OpenPort();
-            }
-            else if (form2.DialogResult == System.Windows.Forms.DialogResult.Cancel)
-            {
-                /*
-                if (GlobalData.sp_Arduino.IsOpen())
-                {
-                    GlobalData.sp_Arduino.OpenPort_Arduino(GlobalData.Arduino_Comport);
-                    ArduinoLED.Invoke(0);
-                }
-                */
             }
         }
 
@@ -2318,7 +2309,7 @@ namespace Cheese
             {
                 try
                 {
-                    string fileName = DateTime.Now.ToString("yyyyMMd-HHmmssff") + ".jpeg";
+                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + ".jpeg";
 
                     if (cameraSelectMode < 0 && i == 0)
                     {
@@ -2766,14 +2757,14 @@ namespace Cheese
             Graphics gph = Graphics.FromImage(bmp);
             // 1. Draw time
             DateTime dt = DateTime.Now;
-            gph.DrawString(string.Format("{0:R}", dt), new Font("Arial", 12), Brushes.Yellow, 0, 0);
+            gph.DrawString(string.Format("{0:R}", dt), new Font("Arial", 16), Brushes.Yellow, 0, 0);
             // 2. Draw AC on/off status
             if (GlobalData.Arduino_relay_status)
-                gph.DrawString("AC Source: On", new Font("Arial", 12), Brushes.Yellow, 0, 15);
+                gph.DrawString("AC Source: On", new Font("Arial", 16), Brushes.Yellow, 0, 20);
             else
-                gph.DrawString("AC Source: Off", new Font("Arial", 12), Brushes.Yellow, 0, 15);
+                gph.DrawString("AC Source: Off", new Font("Arial", 16), Brushes.Yellow, 0, 20);
             // 3. Draw schedule remark
-            gph.DrawString(string.Format("{0}", remarkStr), new Font("Arial", 12), Brushes.Yellow, 0, 30);
+            gph.DrawString(string.Format("{0}", remarkStr), new Font("Arial", 16), Brushes.Yellow, 0, 40);
             gph.Flush();
 
             //Delay Time
@@ -2814,12 +2805,12 @@ namespace Cheese
             
             if (bitmap != null)
                 bitmap.Dispose();
-            int res_Index = 0; //8;
+            int res_Index = 1; //8;
             if (videoDevices.Count > 0 && videoSource1 == null && videoSource2 == null)
             {
                 videoSource1 = new VideoCaptureDevice(videoDevices[0].MonikerString);
                 //videoSource1.DesiredFrameRate = 10;
-                int resolution_Index_1 = 0; //videoSource1.VideoCapabilities.Count();
+                int resolution_Index_1 = videoSource1.VideoCapabilities.Count(); //videoSource1.VideoCapabilities.Count();
                 // C310 [13/19]: 960x544; // C310 [15/19]: 1024x576; //C615 [11/15]: 960x720
                 //do not set too high resolution in case of crash issue
                 if (resolution_Index_1 >= res_Index)
@@ -2842,7 +2833,7 @@ namespace Cheese
                 Thread.Sleep(300);
                 videoSource2 = new VideoCaptureDevice(videoDevices[1].MonikerString);
                 //videoSource2.DesiredFrameRate = 10;
-                int resolution_Index_2 = 0; //videoSource2.VideoCapabilities.Count();
+                int resolution_Index_2 = videoSource2.VideoCapabilities.Count(); //videoSource2.VideoCapabilities.Count();
                 if (resolution_Index_2 >= res_Index)
                 {
                     videoSource2.VideoResolution = videoSource2.VideoCapabilities[resolution_Index_2 - res_Index];
