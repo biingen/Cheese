@@ -490,6 +490,7 @@ namespace Cheese
 
                 while (loopCounter > 0 && playState)    //(loopCounter > 0 && FlagStop == 0)
                 {
+                    GlobalData.caption_Num = 0;
                     Invoke(UpdateUIBtn, 3, 1);  //display testing
                     // ============= Clear old data ============= //
                     for (ExeIndex = 0; ExeIndex < (RowCount-1); ExeIndex++)
@@ -504,7 +505,6 @@ namespace Cheese
                     //for (ExeIndex = this.dataGridView1.CurrentRow.Index; ExeIndex < RowCount; ExeIndex++)
                     for (ExeIndex = 0; ExeIndex < (RowCount-1); ExeIndex++)
                     {
-                        
                         string columns_command = dataGridView1.Rows[ExeIndex].Cells[0].Value == null ? string.Empty : dataGridView1.Rows[ExeIndex].Cells[0].Value.ToString().Trim();
                         string columns_times = dataGridView1.Rows[ExeIndex].Cells[1].Value == null ? string.Empty:dataGridView1.Rows[ExeIndex].Cells[1].Value.ToString().Trim();
                         string columns_interval = dataGridView1.Rows[ExeIndex].Cells[2].Value == null ? string.Empty : dataGridView1.Rows[ExeIndex].Cells[2].Value.ToString().Trim();
@@ -550,6 +550,7 @@ namespace Cheese
                         if ((columns_command == "_shot") || (columns_command == "PHOTO") || (columns_command == "photo"))
                         {
                             int camSelectMode = 0;
+                            GlobalData.caption_Num++;
                             //byte[] decodeFromStr = new byte[2];
                             //decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
 
@@ -2309,7 +2310,7 @@ namespace Cheese
             {
                 try
                 {
-                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + ".jpeg";
+                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "_" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "_" + GlobalData.caption_Num + ".jpeg";
 
                     if (cameraSelectMode < 0 && i == 0)
                     {

@@ -102,6 +102,7 @@ namespace Cheese
         public static int IO_Arduino9_1_COUNT = 0;
 
         public static int Loop_Number = 0;
+        public static int caption_Num = 0;
         public static string RS232_chksumByte = "";
         public static string RS232_receivedText = "";
         public static string RS232_sentText = "";
