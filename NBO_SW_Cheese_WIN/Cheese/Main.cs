@@ -2310,7 +2310,7 @@ namespace Cheese
             {
                 try
                 {
-                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "_" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "_" + GlobalData.caption_Num + ".jpeg";
+                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "(" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "-" + GlobalData.caption_Num + ")" + ".jpeg";
 
                     if (cameraSelectMode < 0 && i == 0)
                     {
