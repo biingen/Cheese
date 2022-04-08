@@ -247,114 +247,77 @@ namespace ModuleLayer
                 return original_data_chksum;
         }
 
-        public string XOR8_FtdiDataParsing(ref string original_data, ref string content_data, byte[] cmdLineBytes, byte[] readBytes, ref byte DeviceAddress, int arraySize)
+        public string XOR8_FtdiDataParsing(ref string original_data, ref string content_data, byte[] cmdLineBytes, byte[] returnBytes, ref byte DeviceAddress, int arraySize)
         {
-            log.Debug("XOR8_CalculateChksum: " + original_data + ", " + readBytes + ", " + arraySize);
-            string[] hexValuesSplit = new string[arraySize];
-            string XOR_Hex = "", content_data_ascii = "";
-            byte XOR_value = new byte();// XOR(WithCalChk[0], WithCalChk[1]);
-            int hex_number = 0;
-
-            if (original_data != "")    //Used to replace XOR8_BytesWithChksum if possible in the future
+            //if (original_data == "" && DeviceAddress == 0x50)
+            log.Debug("Command Line: " + original_data + " ; DeviceAddress: " + DeviceAddress);
+            string content_data_ascii = "";
+            try
             {
-                /*
-				hexValuesSplit = original_data.Split(' ');
-                original_data = "";
-                for (int i = 0; i < arraySize;  i++)          //turn into Byte array
+                string byteString = "", XOR_Hex = "";
+                byte XOR_value = DeviceAddress;
+                byte[] tmpArray = new byte[arraySize];
+                Array.Copy(returnBytes, tmpArray, arraySize);
+                tmpArray[arraySize - 1] = 0x00;
+
+                for (int i = 0; i < arraySize; i++)          //turn into String for debug print
                 {
-                    // Convert the number expressed in base-16 to an integer.
-                    readBytes[i] = Convert.ToByte(Convert.ToInt32(hexValuesSplit[i], 16));
-                    
                     //Come out updated cmd string with calculated chksum
-                    if (i == 0)
-                    {
-                        DeviceAddress = readBytes[i];
-                        //original_data += " " + hexValuesSplit[i];
-                    }
-                    else if (i > 0 && i < arraySize - 1)
+                    if (i < arraySize - 1)
                     {   // i = 1 to (arraySize - 1)
-                        XOR_value = XOR(readBytes[i], XOR_value);
-                        original_data += " " + hexValuesSplit[i];
+                        XOR_value = XOR(tmpArray[i], XOR_value);
+                        byteString = ((int)returnBytes[i]).ToString("X2").PadLeft(2, '0');
+                        original_data += byteString + " ";
                     }
                     else if (i == arraySize - 1)
                     {
-                        XOR_value = XOR(readBytes[i], XOR_value);
-                        readBytes[i] = XOR_value;
+                        XOR_value = XOR(tmpArray[i], XOR_value);
+                        tmpArray[i] = XOR_value;
                         XOR_Hex = ((int)XOR_value).ToString("X2").PadLeft(2, '0');
-                        original_data += " " + XOR_Hex;
+                        original_data += XOR_Hex;
                     }
-                    
+
                 }
-                */
-                //DeviceAddress = WithCalChk[0];
+
+                if (tmpArray[arraySize - 1] == returnBytes[arraySize - 1])
+                {
+                    if (returnBytes[4] == cmdLineBytes[4] && returnBytes[5] == 0)   //cmdLineBytes[4]: sub-cmd && cmdLineBytes[5]: op code
+                    {
+                        int num = 0;
+
+                        for (int j = 7; j < arraySize - 1; j++)
+                        {
+                            if (j < arraySize - 2)
+                                content_data += ((int)returnBytes[j]).ToString("X2").PadLeft(2, '0') + " ";
+                            else if (j == arraySize - 2)
+                                content_data += ((int)returnBytes[j]).ToString("X2").PadLeft(2, '0');
+
+                            tmpArray[num++] = returnBytes[j];
+                        }
+                        byte[] tmpByte = new byte[num];
+                        Array.Copy(tmpArray, tmpByte, num);
+                        content_data_ascii = Encoding.ASCII.GetString(tmpByte);
+                    }
+                    else if (returnBytes[4] == cmdLineBytes[4] && returnBytes[4] != 0)   //readBytes[5]: reply result
+                    {
+                        content_data = "Reply with Error!";
+                        content_data_ascii = content_data;
+                    }
+                }
+                else
+                {
+                    string readChk_Hex = ((int)returnBytes[arraySize - 1]).ToString("X2").PadLeft(2, '0');
+                    content_data = $"Replied Chksum - {readChk_Hex} vs Calculated Chksum - {XOR_Hex}";
+                    content_data_ascii = content_data;
+                }
+                
             }
-            else if (original_data == "" && DeviceAddress == 0x50)
+            catch (OverflowException)
             {
-                try
-                {
-                    string byteString = "";
-                    original_data = "";
-                   XOR_value = DeviceAddress;
-                    byte[] tmpArray = new byte[arraySize];
-                    Array.Copy(readBytes, tmpArray, arraySize);
-                    tmpArray[arraySize - 1] = 0x00;
-
-                    for (int i = 0; i < arraySize; i++)          //turn into String for debug print
-                    {
-                        //Come out updated cmd string with calculated chksum
-                        if (i < arraySize - 1)
-                        {   // i = 1 to (arraySize - 1)
-                            XOR_value = XOR(tmpArray[i], XOR_value);
-                            byteString = ((int)readBytes[i]).ToString("X2").PadLeft(2, '0');
-                            original_data += " " + byteString;
-                        }
-                        else if (i == arraySize - 1)
-                        {
-                            XOR_value = XOR(tmpArray[i], XOR_value);
-                            tmpArray[i] = XOR_value;
-                            XOR_Hex = ((int)XOR_value).ToString("X2").PadLeft(2, '0');
-                            original_data += " " + XOR_Hex;
-                        }
-
-                    }
-                    if (tmpArray[arraySize - 1] == readBytes[arraySize - 1])
-                    {
-                        if (readBytes[4] == cmdLineBytes[4] && readBytes[5] == 0)
-                        {
-                            int num = 0;
-                            
-                            for (int j = 7; j < arraySize - 1; j++)
-                            {
-                                if (j < arraySize - 2)
-                                    content_data += ((int)readBytes[j]).ToString("X2").PadLeft(2, '0') + " ";
-                                else if (j == arraySize - 2)
-                                    content_data += ((int)readBytes[j]).ToString("X2").PadLeft(2, '0');
-
-                                tmpArray[num++] = readBytes[j];
-                            }
-                            byte[] tmpByte = new byte[num];
-                            Array.Copy(tmpArray, tmpByte, num);
-                            content_data_ascii = Encoding.ASCII.GetString(tmpByte);
-                        }
-                        else if (readBytes[3] == cmdLineBytes[4] && readBytes[4] != 0)
-                        {
-                            content_data = "Reply with Error!";
-                        }
-                    }
-                    else
-                    {
-                        string readChk_Hex = ((int)readBytes[arraySize - 1]).ToString("X2").PadLeft(2, '0');
-                        content_data = $"Replied Chksum - {readChk_Hex} vs Calculated Chksum - {XOR_Hex}";
-                    }
-					
-                }
-                catch (OverflowException)
-                {
-                    MessageBox.Show("Please check HEX command format.", "Format error");
-                }
+                MessageBox.Show("Please check HEX command format.", "Format error");
             }
 
-            return content_data_ascii;  // XOR_Hex;
+            return content_data_ascii;
         }
 
         public byte[] StrToByte(string hexString)

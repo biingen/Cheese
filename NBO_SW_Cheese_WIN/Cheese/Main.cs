@@ -71,13 +71,15 @@ namespace Cheese
         bool serial_receive = false;
         int GPIO_Read_Data = 0xAA00;
         // ----------------------------------------------------------------------------------------------- //
+        static int cmdVarStep = 0;
+
         public Main()
         {
             log.Debug("Main");
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.006";
+            this.VerLabel.Text = "Version: 00.00.007";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -481,7 +483,7 @@ namespace Cheese
             byte[] retBuf = new byte[100];
             byte[] finBuf = new byte[100];
             ushort arduino_input_status;
-            int delayTime, RowCount, ExeIndex = 0, forLoopItem = 0;
+            int delayTime, RowCount, ExeIndex = 0, forLoopItem = 0, cmdVar_int = -1;
             
             RowCount = this.dataGridView1.Rows.Count;
             if (RowCount <= 1) 
@@ -1602,34 +1604,41 @@ namespace Cheese
                                 {
                                     //log.Debug("FTDI Write Log: _FTDI_Write");
                                     int packetLen = columns_cmdLine.Split(' ').Count();
+
+                                    if (cmdVar_int >= 0 && columns_cmdLine.Contains("XX"))
+                                    {
+                                        string cmdVariable = cmdVarStep.ToString("X2").PadLeft(2, '0');
+                                        string columns_cmdLine_subPart = columns_cmdLine.Substring(0, columns_cmdLine.Length - 2);
+                                        columns_cmdLine = columns_cmdLine_subPart + cmdVariable;
+                                    }
+
                                     byte[] cmdBytes = new byte[packetLen + 1];     //Plus 1 is reserved for checksum Byte
                                     var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
+                                    
                                     byte DeviceAddr = cmdBytes[0];
                                     byte[] DeviceData = new byte[packetLen];
                                     Array.Copy(cmdBytes, 1, DeviceData, 0, packetLen);
 									
                                     FtResult writeResult = GlobalData.Ftdi_lib.I2C_SEQ_Write(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData);
-                                    resultLine = "";
-                                    for (int index = 0; index < packetLen; index++)
-                                    {
-                                        resultLine += DeviceData[index].ToString("X2");
-                                        if (index != (packetLen - 1))
-                                            resultLine += " ";
-                                    }
-                                    log.Info($"[FTDI-Write] {DeviceAddr:X2} {resultLine}_:_{columns_remark}");
-                                    log.Info($"[Write Result] {(FtResult)writeResult}_:_{columns_remark}");
+                                    columns_cmdLine += " " + tstStr;
+
+                                    log.Info($"[{columns_remark}]_{columns_cmdLine}_");
+                                    log.Info($"[==>Write Result] {(FtResult)writeResult}");
                                     Invoke(WriteDataGrid, 10, ExeIndex, writeResult.ToString());
+                                    columns_cmdLine = "";
                                 }
                                 else if (columns_function == "Read" && columns_cmdLine != "")
                                 {
                                     //log.Debug("FTDI Write Log: _FTDI_Read");
+                                    string dataContent = "";
                                     int packetLen = columns_cmdLine.Split(' ').Count();
                                     byte recLength = 0x00;
-                                    byte[] readBytes = new byte[128];
+                                    byte[] readBytes = new byte[128];   //128-Byte is already designated in ftdi library
                                     byte[] cmdBytes = new byte[packetLen + 1];     //Plus 1 is reserved for checksum Byte
                                     var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
                                     byte DeviceAddr = cmdBytes[0];
                                     byte[] DeviceData = new byte[packetLen];
+                                    
                                     Array.Copy(cmdBytes, 1, DeviceData, 0, packetLen);
                                     resultLine = "";
                                     for (int index = 0; index < packetLen; index++)
@@ -1638,20 +1647,21 @@ namespace Cheese
                                         if (index != (packetLen - 1))
                                             resultLine += " ";
                                     }
-                                    log.Info($"[FTDI-Read] {resultLine}");
+                                    
+                                    log.Info($"[{columns_remark}]_{columns_cmdLine}_");
+                                    columns_cmdLine = "";
+                                    Thread.Sleep(500);
                                     if (GlobalData.Ftdi_lib.I2C_SEQ_Read(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData, readBytes, out recLength) == FtResult.Ok)
                                     {
-                                        byte[] tmpBytes = new byte[recLength];
-                                        byte chkInPacket = readBytes[recLength - 1];
-                                        Array.Copy(readBytes, tmpBytes, recLength);
-                                        string dataContent = "";
+                                        // Below part is used to print data content with raw data and ascii data formats
+                                        //string dataContent = "";
                                         resultLine = "";
                                         DeviceAddr = 0x50;
                                         string ascii_replyData = dataConv.XOR8_FtdiDataParsing(ref resultLine, ref dataContent, cmdBytes, readBytes, ref DeviceAddr, recLength);
 										
-                                        log.Info($"[FTDI-Reply] {resultLine}_:_{columns_remark}");
-                                        log.Info($"[Reply Raw Data] {dataContent}_:_{columns_remark}");
-                                        log.Info($"[Reply ASCII] {ascii_replyData}_:_{columns_remark}");
+                                        log.Info($"[FTDI-Reply]_{resultLine}_");
+                                        log.Info($"[==>Raw Data]_{dataContent}_");
+                                        log.Info($"[=====>ASCII] ({ascii_replyData})");
                                     }
                                 }
 
@@ -1703,8 +1713,16 @@ namespace Cheese
                                     if (forLoopIndexList.ElementAt(forLoopItem).Item1 % 2 == 0 && ExeIndex == forLoopIndexList.ElementAt(forLoopItem).Item2)
                                     {
                                         //FOR Loop start index:
-                                        if (columns_function != "")
-                                            forLoopCount = Convert.ToInt32(columns_function);
+                                        if (columns_times != "")
+                                        {
+                                            forLoopCount = Convert.ToInt32(columns_times);
+                                            // ...... FOR Loop Write Index Byte is ready to start a local loop ...... //
+                                            if (columns_interval != "" && columns_cmdLine != "")
+                                            {
+                                                cmdVar_int = forLoopCount;
+                                                cmdVarStep = Convert.ToInt32(columns_interval);
+                                            }
+                                        }
                                         else
                                             forLoopCount = 1;
 
@@ -1719,12 +1737,18 @@ namespace Cheese
                                             forLoopCount--;
                                             Invoke(updateDataGrid, ExeIndex, -5, "");   //unselect forLoopEnd row
                                             ExeIndex = forLoopIndexList.ElementAt(forLoopItem - 1).Item2;    //go back to start row
+                                            // ...... FOR Loop Write Index Byte is going a local loop ...... //
+                                            cmdVar_int--;
+                                            cmdVarStep++;
                                             log.Info("FOR Loop - Row " + ExeIndex.ToString() + " remaining " + forLoopCount.ToString());
                                         }
                                         else if (forLoopCount == 1)
                                         {
                                             forLoopCount--;
                                             forLoopItem++;  //go to next start row
+                                            // ...... FOR Loop Write Index Byte is resumed as initial ...... //
+                                            cmdVar_int = -1;
+                                            //cmdVarStep = 0;
                                         }
                                     }
                                 }
