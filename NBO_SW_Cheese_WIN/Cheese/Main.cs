@@ -77,7 +77,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.005";
+            this.VerLabel.Text = "Version: 00.00.006";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -1607,8 +1607,8 @@ namespace Cheese
                                     byte DeviceAddr = cmdBytes[0];
                                     byte[] DeviceData = new byte[packetLen];
                                     Array.Copy(cmdBytes, 1, DeviceData, 0, packetLen);
-                                    
-                                    GlobalData.Ftdi_lib.I2C_SEQ_Write(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData);
+									
+                                    FtResult writeResult = GlobalData.Ftdi_lib.I2C_SEQ_Write(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData);
                                     resultLine = "";
                                     for (int index = 0; index < packetLen; index++)
                                     {
@@ -1617,6 +1617,8 @@ namespace Cheese
                                             resultLine += " ";
                                     }
                                     log.Info($"[FTDI-Write] {DeviceAddr:X2} {resultLine}_:_{columns_remark}");
+                                    log.Info($"[Write Result] {(FtResult)writeResult}_:_{columns_remark}");
+                                    Invoke(WriteDataGrid, 10, ExeIndex, writeResult.ToString());
                                 }
                                 else if (columns_function == "Read" && columns_cmdLine != "")
                                 {
@@ -1642,29 +1644,14 @@ namespace Cheese
                                         byte[] tmpBytes = new byte[recLength];
                                         byte chkInPacket = readBytes[recLength - 1];
                                         Array.Copy(readBytes, tmpBytes, recLength);
-                                        string calculateLine = "";
+                                        string dataContent = "";
                                         resultLine = "";
-                                        
-                                        for (int index = 0; index < recLength; index++)
-                                        {
-                                            if (index != (recLength - 1))
-                                            {
-                                                resultLine += tmpBytes[index].ToString("X2");
-                                                resultLine += " ";
-                                            }
-                                            else
-                                            {
-                                                calculateLine = resultLine + "50";
-                                                resultLine += tmpBytes[index].ToString("X2");
-                                            }
-                                        }
-                                        
-                                        dataConv.XOR8_BytesWithChksum(calculateLine, tmpBytes, recLength);
-                                        if (chkInPacket != tmpBytes[recLength - 1])
-                                            log.Info($"[FTDI-Reply] Checksum is incorrect!!");
-                                            //MessageBox.Show("Ftdi_Port_Receive no data !!", "The checksum error!!");
-
+                                        DeviceAddr = 0x50;
+                                        string ascii_replyData = dataConv.XOR8_FtdiDataParsing(ref resultLine, ref dataContent, cmdBytes, readBytes, ref DeviceAddr, recLength);
+										
                                         log.Info($"[FTDI-Reply] {resultLine}_:_{columns_remark}");
+                                        log.Info($"[Reply Raw Data] {dataContent}_:_{columns_remark}");
+                                        log.Info($"[Reply ASCII] {ascii_replyData}_:_{columns_remark}");
                                     }
                                 }
 

@@ -103,6 +103,7 @@ namespace Cheese
 
         public static int Loop_Number = 0;
         public static int caption_Num = 0;
+        public static bool RS232_A_Flag = false;
         public static string RS232_chksumByte = "";
         public static string RS232_receivedText = "";
         public static string RS232_sentText = "";
