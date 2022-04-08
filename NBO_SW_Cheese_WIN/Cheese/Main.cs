@@ -69,7 +69,7 @@ namespace Cheese
         // ---------------------------------- Arduino parameter ---------------------------------- //
         string Read_Arduino_Data = "";
         bool serial_receive = false;
-        int GPIO_Read_Data = 0xAA00;
+        int GPIO_Read_Data = 0x0000;
         // ----------------------------------------------------------------------------------------------- //
         static int cmdVarStep = 0;
 
@@ -79,7 +79,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.007";
+            this.VerLabel.Text = "Version: 00.00.008";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -878,6 +878,8 @@ namespace Cheese
                         else if (columns_command == "_Arduino_Pin"
                             && columns_comport.Length >=6 && columns_comport.Substring(0,3) == "_P0")
                         {
+                            Arduino_Get_GPIO_Input(ref GPIO_Read_Data, 300);
+                            
                             arduino_input_status = GlobalData.Arduino_IO_INPUT_status;
                             switch (columns_comport.Substring(3, 1))
                             {
@@ -918,8 +920,7 @@ namespace Cheese
                                         }
                                     }
                                     // --- pin 1: expect getting High value when monitor turns off --- //
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-											 (GlobalData.Arduino_IO_INPUT_value & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && (GlobalData.Arduino_IO_INPUT_value & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -931,7 +932,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if(Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if(columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -957,13 +958,15 @@ namespace Cheese
 
                                     if ((arduino_input_status & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-01 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.2 / P03 --
                                 case "3":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 1) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 1) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -995,8 +998,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 1) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 1) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1008,7 +1010,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1034,13 +1036,15 @@ namespace Cheese
                                     
                                     if ((arduino_input_status >> 1 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-02 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.3 / P04 --
                                 case "4":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 2) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 2) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1072,8 +1076,7 @@ namespace Cheese
                                         }
                                     }
                                     // --- pin 1: expect getting High value when monitor turns off --- //
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                            ((GlobalData.Arduino_IO_INPUT_value >> 2) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 2) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1084,7 +1087,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1110,13 +1113,15 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 2 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-03 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.4 / P05 --
                                 case "5":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 3) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 3) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1147,8 +1152,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 3) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 3) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1159,7 +1163,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1185,13 +1189,15 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 3 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-04 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.5 / P06 --
                                 case "6":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 4) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 4) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1222,8 +1228,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 4) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 4) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1234,7 +1239,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1260,13 +1265,15 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 4 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-05 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.6 / P07 --
                                 case "7":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 5) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 5) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1297,8 +1304,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 5) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 5) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1309,7 +1315,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1335,13 +1341,15 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 5 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-06 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.7 / P08 --
                                 case "8":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 6) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 6) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1372,8 +1380,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 6) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 6) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1384,7 +1391,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1410,13 +1417,15 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 6 & 0x01U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-07 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                 #endregion
 
                                 #region -- No.8 / P09 --
                                 case "9":
-                                    if (columns_comport.Substring(5, 1) == "0" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 7) & 0x01U) == 0)
+                                    if (columns_comport.Substring(5, 1) == "0" && ((GlobalData.Arduino_IO_INPUT_value >> 7) & 0x01U) == 0)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1447,8 +1456,7 @@ namespace Cheese
                                             //IO_CMD();
                                         }
                                     }
-                                    else if (columns_comport.Substring(5, 1) == "1" &&
-                                        ((GlobalData.Arduino_IO_INPUT_value >> 7) & 0x01U) == 1)
+                                    else if (columns_comport.Substring(5, 1) == "1" && ((GlobalData.Arduino_IO_INPUT_value >> 7) & 0x01U) == 1)
                                     {
                                         if (columns_cmdLine == "_accumulate")
                                         {
@@ -1459,7 +1467,7 @@ namespace Cheese
                                             int cameraIdx = 0;
                                             if (columns_subFunction == "all" || columns_subFunction == "")
                                                 cameraIdx = -1;
-                                            else if (Convert.ToChar(columns_subFunction[0]) > 0x30 && Convert.ToChar(columns_subFunction[0]) < 0x39)
+                                            else if (columns_subFunction != "")
                                                 cameraIdx = Convert.ToInt32(columns_subFunction);
 
                                             if (videoDevices.Count >= 1)
@@ -1485,6 +1493,9 @@ namespace Cheese
 
                                     if ((arduino_input_status >> 7 & 0x80U) == 1)
                                         Invoke(WriteDataGrid, 10, ExeIndex, "Module-08 fail!");
+
+                                    //Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Arduino_IO_INPUT_value.ToString("X2"));
+                                    log.Info($"[Input Table Value] 0x{GlobalData.Arduino_IO_INPUT_value.ToString("X2")}");
                                     break;
                                     #endregion
                             }
@@ -1873,7 +1884,7 @@ namespace Cheese
                                 valStr += tmpBt[i].ToString();
                         }*/
                         
-                        Thread.Sleep(300);
+                        Thread.Sleep(delay_time);
                         
                         serial_receive = GlobalData.Arduino_recFlag;
                         if (!serial_receive && retry_cnt == 0)
@@ -2426,7 +2437,7 @@ namespace Cheese
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Snapshot error: " + ex);
+                    MessageBox.Show("Actual number of WebCam is lower than setting!\n" + ex);
                 }
                 
             }
