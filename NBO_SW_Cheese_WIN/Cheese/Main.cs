@@ -33,6 +33,8 @@ namespace Cheese
         public int FlagComPortStauts; 
         bool playState, pauseState, flagLoopTimes;
         int FlagPause, FlagStop, loopTimes = 0, loopCounter = 0;
+        int forLoopCount = 0;
+        List<Tuple<int, int>> forLoopIndexList = new List<Tuple<int, int>>();
         static string Cmdsend, Cmdreceive;
         int Device, Resolution;
         public double timeout;
@@ -75,7 +77,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.003";
+            this.VerLabel.Text = "Version: 00.00.005";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -353,8 +355,8 @@ namespace Cheese
             string[] tempStr;
             string[] cmdStr;
             char[] CRCStr = new char[5];
-            int i = 0,j = 0, y = 0;
-            int colIndex, colBoundary = 9;
+            int i = 0, j = 0, y = 0;
+            int colIndex, colBoundary = 9, forStringCount = 0;
             byte HighHalfByte, LowHalfByte;
             byte[] tempData = new byte[100];
             ushort CRCResult;
@@ -362,6 +364,9 @@ namespace Cheese
             dUpdateDataGrid updateDataGrid = new dUpdateDataGrid(UpdateUiData);
             System.IO.StreamReader rFile = new System.IO.StreamReader(@TargetFilePath);
             updateDataGrid.Invoke(0, -2, "");   //Clear datagrid
+
+            if (forLoopIndexList.Count > 0) //Clear count of FOR Loop Items
+                forLoopIndexList.Clear();
 
             rFile.ReadLine();      //just read the header line and do nothing with it
             while ((contentLine = rFile.ReadLine()) != null)
@@ -427,6 +432,13 @@ namespace Cheese
                                     }*/
                                 }
                             }
+
+                            // Record pair indices of FOR Loop start and end
+                            if (colIndex == 0 && tempStr[0] == "_FOR")
+                            {
+                                forLoopIndexList.Add(new Tuple<int, int>(forStringCount, y));
+                                forStringCount++;
+                            }
                         }
                         
                     }   //end of For loop
@@ -440,8 +452,16 @@ namespace Cheese
                 }
             }   //end of While loop
 
-            rFile.Close();
-            updateDataGrid.Invoke(0, -3, "");   //Fresh datagrid
+            if (forLoopIndexList.Count % 2 != 0)
+            {
+                MessageBox.Show("For Loop must be specified pairs of start and end index!!!");
+            }
+            else
+            {
+                rFile.Close();
+                updateDataGrid.Invoke(0, -3, "");   //Fresh datagrid
+                //forStringCount = 0;
+            }
         }
         // ------------------------------------------------------------------------------------------------ //
         private void ExecuteCmd()
@@ -461,7 +481,7 @@ namespace Cheese
             byte[] retBuf = new byte[100];
             byte[] finBuf = new byte[100];
             ushort arduino_input_status;
-            int delayTime, RowCount, ExeIndex = 0;
+            int delayTime, RowCount, ExeIndex = 0, forLoopItem = 0;
             
             RowCount = this.dataGridView1.Rows.Count;
             if (RowCount <= 1) 
@@ -499,7 +519,7 @@ namespace Cheese
                         dataGridView1.Rows[ExeIndex].Cells[11].Value = "";
                         dataGridView1.Rows[ExeIndex].Cells[12].Value = "";
                         dataGridView1.Rows[ExeIndex].Cells[13].Value = "";
-                        Invoke(updateDataGrid, ExeIndex, -5, "");   //clear select status
+                        Invoke(updateDataGrid, ExeIndex, -5, "");   //unselect current row
                     }
                     // ============= Start to test ============= //
                     //for (ExeIndex = this.dataGridView1.CurrentRow.Index; ExeIndex < RowCount; ExeIndex++)
@@ -515,18 +535,7 @@ namespace Cheese
                         string columns_switch = dataGridView1.Rows[ExeIndex].Cells[7].Value == null ? string.Empty : dataGridView1.Rows[ExeIndex].Cells[7].Value.ToString().Trim();
                         string columns_wait = dataGridView1.Rows[ExeIndex].Cells[8].Value == null ? string.Empty : dataGridView1.Rows[ExeIndex].Cells[8].Value.ToString().Trim();
                         string columns_remark = dataGridView1.Rows[ExeIndex].Cells[9].Value == null ? string.Empty : dataGridView1.Rows[ExeIndex].Cells[9].Value.ToString().Trim();
-                        /*
-                        string columns_command = dataGridView1.Rows[ExeIndex].Cells[0].Value.ToString().Trim();
-                        string columns_times = dataGridView1.Rows[ExeIndex].Cells[1].Value.ToString().Trim();
-                        string columns_interval = dataGridView1.Rows[ExeIndex].Cells[2].Value.ToString().Trim();
-                        string columns_comport = dataGridView1.Rows[ExeIndex].Cells[3].Value.ToString().Trim();
-                        string columns_function = dataGridView1.Rows[ExeIndex].Cells[4].Value.ToString().Trim();
-                        string columns_subFunction = dataGridView1.Rows[ExeIndex].Cells[5].Value.ToString().Trim();
-                        string columns_cmdLine = dataGridView1.Rows[ExeIndex].Cells[6].Value.ToString().Trim();
-                        string columns_switch = dataGridView1.Rows[ExeIndex].Cells[7].Value.ToString().Trim();
-                        string columns_wait = dataGridView1.Rows[ExeIndex].Cells[8].Value.ToString().Trim();
-                        string columns_remark = dataGridView1.Rows[ExeIndex].Cells[9].Value.ToString().Trim();
-                        */
+
                         if (ExeIndex >= 3)
                         {
                             Invoke(updateDataGrid, (ExeIndex - 2), -4, "");
@@ -538,7 +547,7 @@ namespace Cheese
                         
                         if (ExeIndex >= 1)
                         {
-                            Invoke(updateDataGrid, (ExeIndex - 1), -5, "");     //clear select status
+                            Invoke(updateDataGrid, (ExeIndex - 1), -5, "");      //unselect previous row
                         }
                         Invoke(updateDataGrid, ExeIndex, -6, "");
                         this.dataGridView1.Rows[ExeIndex].Cells[10].Value = "";
@@ -1697,7 +1706,63 @@ namespace Cheese
                             }
                         }
                         #endregion
+                        #region -- FOR Loop --
+                        else if (columns_command == "_FOR")
+                        {
+                            try
+                            {
+                                if (forLoopItem < forLoopIndexList.Count)
+                                {
+                                    if (forLoopIndexList.ElementAt(forLoopItem).Item1 % 2 == 0 && ExeIndex == forLoopIndexList.ElementAt(forLoopItem).Item2)
+                                    {
+                                        //FOR Loop start index:
+                                        if (columns_function != "")
+                                            forLoopCount = Convert.ToInt32(columns_function);
+                                        else
+                                            forLoopCount = 1;
 
+                                        forLoopItem++;  //go to end row
+                                    }
+
+                                    if (forLoopIndexList.ElementAt(forLoopItem).Item1 % 2 == 1 && ExeIndex == forLoopIndexList.ElementAt(forLoopItem).Item2)
+                                    {
+                                        //FOR Loop end index:
+                                        if (forLoopCount > 1)
+                                        {
+                                            forLoopCount--;
+                                            Invoke(updateDataGrid, ExeIndex, -5, "");   //unselect forLoopEnd row
+                                            ExeIndex = forLoopIndexList.ElementAt(forLoopItem - 1).Item2;    //go back to start row
+                                            log.Info("FOR Loop - Row " + ExeIndex.ToString() + " remaining " + forLoopCount.ToString());
+                                        }
+                                        else if (forLoopCount == 1)
+                                        {
+                                            forLoopCount--;
+                                            forLoopItem++;  //go to next start row
+                                        }
+                                    }
+                                }
+                                
+                            }
+                            catch (SystemException se)
+                            {
+                                MessageBox.Show(se.ToString());
+                                break;
+                            }
+                            /*
+                            if (ExeIndex == forLoopEnd1 && forLoopCount > 1)
+                            {
+                                forLoopCount--;
+                                ExeIndex = forLoopStart1;
+                                Invoke(updateDataGrid, forLoopEnd1, -5, "");   //unselect forLoopEnd1 row
+                            }
+                            else if (ExeIndex == forLoopEnd1 && forLoopCount == 1)
+                            {
+                                forLoopCount--;
+                                ExeIndex = tempExeIndex;
+                            }
+                            */
+                        }
+                        #endregion
                         //if (FlagPause == 1)
                         if (pauseState)
                         {
@@ -2310,7 +2375,7 @@ namespace Cheese
             {
                 try
                 {
-                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "(" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "-" + GlobalData.caption_Num + ")" + ".jpeg";
+                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "_" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "_" + GlobalData.caption_Num + ".jpeg";
 
                     if (cameraSelectMode < 0 && i == 0)
                     {
@@ -2811,7 +2876,7 @@ namespace Cheese
             {
                 videoSource1 = new VideoCaptureDevice(videoDevices[0].MonikerString);
                 //videoSource1.DesiredFrameRate = 10;
-                int resolution_Index_1 = videoSource1.VideoCapabilities.Count(); //videoSource1.VideoCapabilities.Count();
+                int resolution_Index_1 = videoSource1.VideoCapabilities.Count();
                 // C310 [13/19]: 960x544; // C310 [15/19]: 1024x576; //C615 [11/15]: 960x720
                 //do not set too high resolution in case of crash issue
                 if (resolution_Index_1 >= res_Index)
@@ -2834,7 +2899,7 @@ namespace Cheese
                 Thread.Sleep(300);
                 videoSource2 = new VideoCaptureDevice(videoDevices[1].MonikerString);
                 //videoSource2.DesiredFrameRate = 10;
-                int resolution_Index_2 = videoSource2.VideoCapabilities.Count(); //videoSource2.VideoCapabilities.Count();
+                int resolution_Index_2 = videoSource2.VideoCapabilities.Count();
                 if (resolution_Index_2 >= res_Index)
                 {
                     videoSource2.VideoResolution = videoSource2.VideoCapabilities[resolution_Index_2 - res_Index];

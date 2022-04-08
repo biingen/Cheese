@@ -88,7 +88,7 @@ namespace Cheese
                                 button1.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button1.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO02":
+                            case "UP":// "GPIO02":
                                 button2.Text = GPIOCode.Element("GPIO_N").Value;
                                 button2_down = GPIOCode.Element("GPIO_D").Value;
                                 button2_up = GPIOCode.Element("GPIO_U").Value;
@@ -102,21 +102,21 @@ namespace Cheese
                                 button3.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button3.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO04":
+                            case "LEFT":// "GPIO04":
                                 button4.Text = GPIOCode.Element("GPIO_N").Value;
                                 button4_down = GPIOCode.Element("GPIO_D").Value;
                                 button4_up = GPIOCode.Element("GPIO_U").Value;
                                 button4.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button4.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO05":
+                            case "MENU":// "GPIO05":
                                 button5.Text = GPIOCode.Element("GPIO_N").Value;
                                 button5_down = GPIOCode.Element("GPIO_D").Value;
                                 button5_up = GPIOCode.Element("GPIO_U").Value;
                                 button5.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button5.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO06":
+                            case "RIGHT":// "GPIO06":
                                 button6.Text = GPIOCode.Element("GPIO_N").Value;
                                 button6_down = GPIOCode.Element("GPIO_D").Value;
                                 button6_up = GPIOCode.Element("GPIO_U").Value;
@@ -130,7 +130,7 @@ namespace Cheese
                                 button7.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button7.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO08":
+                            case "DOWN":// "GPIO08":
                                 button8.Text = GPIOCode.Element("GPIO_N").Value;
                                 button8_down = GPIOCode.Element("GPIO_D").Value;
                                 button8_up = GPIOCode.Element("GPIO_U").Value;
@@ -144,21 +144,21 @@ namespace Cheese
                                 button9.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button9.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO10":
+                            case "L --":
                                 button10.Text = GPIOCode.Element("GPIO_N").Value;
                                 button10_down = GPIOCode.Element("GPIO_D").Value;
                                 button10_up = GPIOCode.Element("GPIO_U").Value;
                                 button10.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button10.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO11":
+                            case "DC":
                                 button11.Text = GPIOCode.Element("GPIO_N").Value;
                                 button11_down = GPIOCode.Element("GPIO_D").Value;
                                 button11_up = GPIOCode.Element("GPIO_U").Value;
                                 button11.MouseDown += new MouseEventHandler(button_MouseDown);
                                 button11.MouseUp += new MouseEventHandler(button_MouseUp);
                                 break;
-                            case "GPIO12":
+                            case "R ++":
                                 button12.Text = GPIOCode.Element("GPIO_N").Value;
                                 button12_down = GPIOCode.Element("GPIO_D").Value;
                                 button12_up = GPIOCode.Element("GPIO_U").Value;
