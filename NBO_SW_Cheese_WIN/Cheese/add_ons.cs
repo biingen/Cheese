@@ -98,7 +98,9 @@ namespace Cheese
                     #endregion
 
                     #region 偵測Arduino
-                    if (deviceId.IndexOf("FTDIBUS\\VID_0403+PID_6001", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if ((deviceId.IndexOf("FTDIBUS\\VID_0403+PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) ||
+                        (deviceId.IndexOf("FTDIBUS\\COMPORT&VID_0403&PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) ||    //for WIN10   
+                        (deviceId.IndexOf("USB\\VID_1A86&PID_7523", StringComparison.OrdinalIgnoreCase) >= 0))      //for another Arduino chip
                     {
                         Console.WriteLine("-----------------Arduino------------------");
                         Console.WriteLine("DeviceID: {0}\n" +

@@ -55,7 +55,6 @@ namespace Cheese
         static int cameraIndex = -1;
         // ----------------------------------------------------------------------------------------------- //
         DataTypeConversion dataConv = new DataTypeConversion();
-        //Mod_RS232 SerialPortHandle = new Mod_RS232();
         static Mod_TCPIP_Client NetworkHandle = new Mod_TCPIP_Client();
         Thread ExecuteCmd_Thread, SerialPort_Receive_Thread, SerialPort_CmdHandling_Thread;
         // ----------------------------------------------------------------------------------------------- //
@@ -79,7 +78,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.008";
+            this.VerLabel.Text = "Version: 00.00.009";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -634,17 +633,20 @@ namespace Cheese
 
                                     
                                 }
-                                else if (columns_function == "GENERAL")
+                                else if (columns_function == "GENERAL" || columns_function == "BENQ")
                                 {
                                     byte[] cmdBytes = new byte[columns_cmdLine.Count()];
                                     cmdBytes = dataConv.StrToByte(columns_cmdLine);
                                     GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                    Thread.Sleep(1000);     //wait long enough to receive serialport data
+                                    Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.Measure_Backlight);
+                                    Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Measure_Thermal);
                                 }
                             }
 
                             if (columns_command == "_HEX_R")
                             {
-                                int rxLength = GlobalData.m_SerialPort.ReceivedBufferLength();
+                                int rxLength = GlobalData.m_SerialPort.ReceiveQueueLength();
 
                                 if (columns_function == "XOR8")
                                 {
@@ -2030,7 +2032,7 @@ namespace Cheese
             //ProcessLoopText LoopText = new ProcessLoopText(UpdateLoopTxt);
             Thread ExecuteCmd_Thread = new Thread(new ThreadStart(ExecuteCmd));
             Thread SerialPort_Receive_Thread = new Thread(new ThreadStart(SerialRxThread));
-            Thread SerialPort_CmdHandling_Thread = new Thread(new ThreadStart(SerialPort_Cmd_Handling));
+            //Thread SerialPort_CmdHandling_Thread = new Thread(new ThreadStart(SerialPort_Cmd_Handling));
 
             //if (playBtnPressed == false && GlobalData.m_SerialPort.IsOpen())
             //if (GlobalData.Arduino_openFlag || GlobalData.m_SerialPort.IsOpen())    //( || TCPIP_socket.IsConnected())
@@ -2045,16 +2047,14 @@ namespace Cheese
                                                 //FlagPause = 0;
                     if (!ExecuteCmd_Thread.IsAlive)
                         ExecuteCmd_Thread.Start();
+
                     //Console.WriteLine("Playing");
                     //Console.WriteLine("Thread ID = {0}", ExecuteCmd_Thread.ManagedThreadId.ToString());
                     //SerialPort_Receive_Thread.IsBackground = true;
+
                     if (!SerialPort_Receive_Thread.IsAlive)
                         SerialPort_Receive_Thread.Start();
-                    //Console.WriteLine("Thread ID = {0}", SerialPort_Receive_Thread.ManagedThreadId.ToString());
-                    //SerialPort_CmdHandling_Thread.IsBackground = true;
-                    if (!SerialPort_CmdHandling_Thread.IsAlive)
-                        SerialPort_CmdHandling_Thread.Start();
-                    //Console.WriteLine("Thread ID = {0}", SerialPort_CmdHandling_Thread.ManagedThreadId.ToString());
+                        
                     Invoke(UpdateUIBtn, 10, 0); //this.BTN_StartTest.Image = global::Cheese.ImageResource.stop;
                     //FlagStop = 0;
                     lock(this)
@@ -2078,12 +2078,15 @@ namespace Cheese
                     if (pauseState)   //(FlagPause == 1)
                         pauseState = false;    //FlagPause = 0;
 
-                    //if (ExecuteCmd_Thread.IsAlive)
-                    ExecuteCmd_Thread.Abort();
-                    //if (SerialPort_Receive_Thread.IsAlive)
-                    SerialPort_Receive_Thread.Abort();
-                    //if (SerialPort_CmdHandling_Thread.IsAlive)
-                    SerialPort_CmdHandling_Thread.Abort();
+                    if (ExecuteCmd_Thread.IsAlive)
+                        ExecuteCmd_Thread.Abort();
+                    
+                    if (SerialPort_Receive_Thread.IsAlive)
+                        SerialPort_Receive_Thread.Abort();
+                    /*
+                    if (SerialPort_CmdHandling_Thread.IsAlive)
+                        SerialPort_CmdHandling_Thread.Abort();
+                    */
                     //Console.WriteLine("Stopping");
                     //Console.WriteLine("Thread ID = {0}", ExecuteCmd_Thread.ManagedThreadId.ToString());
                     //Console.WriteLine("Thread ID = {0}", SerialPort_Receive_Thread.ManagedThreadId.ToString());
@@ -2264,12 +2267,14 @@ namespace Cheese
             form2.ShowDialog(this);
             if (form2.DialogResult == System.Windows.Forms.DialogResult.OK)
             {
+                /*  === do this job at Setting.cs ===
                 ComportStatus = form2.getComPortChecked();
                 PortNumber = form2.getComPortSetting();
                 BaudRate = Convert.ToInt32(form2.getComPortBaudRate());
-                ParityBit = form2.getComPortParrityBit();
+                ParityBit = form2.getComPortParity();
                 StopBit = form2.getComPortStopBit();
                 DataLen = form2.getComPortByteCount();
+                */
                 NetworkStatus = form2.getNetworkChecked();
                 IP = form2.getNetworkIP();
                 NetworkPort = int.Parse(form2.getNetworkPort());
@@ -2277,9 +2282,10 @@ namespace Cheese
                 Device = form2.getCameraDevice();
                 Resolution = form2.getCameraResolution();
 
-                if (ComportStatus == 1)
+                //if (ComportStatus == 1)
                 {
-                    if (GlobalData.m_SerialPort.OpenPort(PortNumber, BaudRate, ParityBit, DataLen, StopBit) >= 1)
+                    //if (GlobalData.m_SerialPort.OpenPort(PortNumber, BaudRate, ParityBit, DataLen, StopBit) >= 1)
+                    if (GlobalData.m_SerialPort.IsOpen())
                     {
                         UILED.Invoke(1);
                     }
@@ -2356,28 +2362,74 @@ namespace Cheese
                 }
             }
         }
-        
-        private void GetSerialData(Mod_RS232 SpHandler)
+		
+        public void SerialRxThread()
         {
-            while (SpHandler.IsOpen())
+            //GetSerialData(GlobalData.m_SerialPort);
+            while (GlobalData.m_SerialPort.IsOpen())
             {
-                int data_to_read = SpHandler.GetRxBytes();
-                if (data_to_read > 0)
+                GlobalData.m_SerialPort.Receive();
+
+                //while (playState)
                 {
-                    byte[] dataset = new byte[data_to_read];
-                    SpHandler.ReadDataIn(dataset, data_to_read);
+                    while (GlobalData.m_SerialPort.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                            //benQ.PacketDequeuedToList(GlobalData.m_SerialPort, ref cmdByteList);
+                            //===benQ.PacketDequeuedToList(GlobalData.m_SerialPort);
+                            //Thread.Sleep(500);
+                            //benQ.QueueAddedToList_ODM_BenQ(ref cmdByteList, ref packetQueueList);
+                            //===benQ.QueueAddedToList_ODM_BenQ(GlobalData.m_SerialPort);
+                        }
+
+                        GlobalData.Measure_Backlight = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.Measure_Thermal = byteToString;
+                    }
+                    Thread.Sleep(1000);
                 }
             }
         }
 
-        public void SerialRxThread()
+        private void SerialPort_Cmd_Handling()
         {
-            GetSerialData(GlobalData.m_SerialPort);
-        }
-		
-        public void Snapshot(int cameraSelectMode, string delayTimeString, string remark)
+                /*while (playState)
+                {
+                    while (GlobalData.m_SerialPort.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                            //benQ.PacketDequeuedToList(GlobalData.m_SerialPort, ref cmdByteList);
+                            //===benQ.PacketDequeuedToList(GlobalData.m_SerialPort);
+                            //Thread.Sleep(500);
+                            //benQ.QueueAddedToList_ODM_BenQ(ref cmdByteList, ref packetQueueList);
+                            //===benQ.QueueAddedToList_ODM_BenQ(GlobalData.m_SerialPort);
+                        }
+
+                        GlobalData.Measure_Backlight = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.Measure_Thermal = byteToString;
+                    }
+                    Thread.Sleep(1000);
+                }*/
+            }
+
+            public void Snapshot(int cameraSelectMode, string delayTimeString, string remark)
         {
-            log.Debug("Snapshot: " + cameraSelectMode + ", " + delayTimeString + ", " + remark);
+            //log.Debug("Snapshot: " + cameraSelectMode + ", " + delayTimeString + ", " + remark);
             string image_currentPath = System.Environment.CurrentDirectory;
             string deviceName = "";
             int camera_counter = 0, camera_startNum = 0;
@@ -2650,14 +2702,27 @@ namespace Cheese
         private void Main_FormClosing(object sender, CancelEventArgs e)
         {
             CloseCamera();
-            GlobalData.sp_Arduino.ClosePort();
+            if (GlobalData.sp_Arduino.IsOpen())
+                GlobalData.sp_Arduino.ClosePort();
+            
+            if (GlobalData.m_SerialPort.IsOpen())
+                GlobalData.m_SerialPort.ClosePort();
+
+            /*  Thread resource collection is aleady hadnled by VS system
+            if (ExecuteCmd_Thread != null)
+                ExecuteCmd_Thread.Abort();
+            if (SerialPort_Receive_Thread != null)
+                SerialPort_Receive_Thread.Abort();
+            if (SerialPort_CmdHandling_Thread.IsAlive)
+                SerialPort_CmdHandling_Thread.Abort();
+            */
             //Environment.Exit(0);
         }
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (SerialPort_Receive_Thread != null && SerialPort_Receive_Thread.IsAlive)
-                SerialPort_Receive_Thread.Abort();
+            /*if (SerialPort_Receive_Thread != null && SerialPort_Receive_Thread.IsAlive)
+                SerialPort_Receive_Thread.Abort();*/
             //CloseCamera();
             
             Environment.Exit(0); //exit the Application process
@@ -2988,37 +3053,6 @@ namespace Cheese
             }
 
             return status;
-        }
-
-        private void SerialPort_Cmd_Handling()
-        {
-            while (GlobalData.m_SerialPort.IsOpen())
-            {
-                //benQ.PacketDequeuedToList(GlobalData.m_SerialPort, ref cmdByteList);
-                //===benQ.PacketDequeuedToList(GlobalData.m_SerialPort);
-                //Thread.Sleep(500);
-                //benQ.QueueAddedToList_ODM_BenQ(ref cmdByteList, ref packetQueueList);
-                //===benQ.QueueAddedToList_ODM_BenQ(GlobalData.m_SerialPort);
-            }
-        }
-
-        private string RawData_Output(List<byte> data)
-        {
-            string HexString = "";
-            int i = 0;
-            if (data != null)
-            {
-                foreach (byte sum in data)
-                {
-                    HexString += (sum.ToString("X2"));
-                    if (i < data.Count - 1)
-                        HexString += " ";
-
-                    i++;
-                }
-            }
-
-            return HexString;
         }
 
         // ====== used along with SerialRxThread ====== //

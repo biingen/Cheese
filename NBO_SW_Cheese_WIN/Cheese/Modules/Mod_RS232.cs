@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using System.IO;
 using System.IO.Ports;
 using Cheese;
 using log4net;
@@ -13,9 +14,14 @@ namespace ModuleLayer
 {
     public class Mod_RS232
     {
+        const int bufferSize = 2048;
         private SerialPort _SerialPortHandle = new SerialPort();
         public Queue ReceiveQueue = new Queue();
         private static ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);        //log4net
+        public Mod_RS232()
+        {
+            //reserved
+        }
 
         //=== main Write function ===//
         public int WriteDataOut(byte[] InBuf, int DataLength)
@@ -96,21 +102,15 @@ namespace ModuleLayer
                 try
                 {
                     if (Len > ReceiveQueue.Count)
-                    {
                         j = ReceiveQueue.Count;
-                    }
                     else
-                    {
                         j = Len;
-                    }
-                    Console.Write("\nInBuf:");
 
                     for (i = 0; i <= (j - 1); i++)
                     {
                         retBuf[i] = (byte)ReceiveQueue.Dequeue();
                         Console.Write("{0,2:X},", retBuf[i]);
                     }
-                    Console.Write("\n");
                 }
                 catch (Exception)
                 {
@@ -120,22 +120,19 @@ namespace ModuleLayer
             }
             return 1;
         }
-        public byte GeneralDequeue()
-        {
-            return ((byte)ReceiveQueue.Dequeue());
-        }
-        public int ReceivedBufferLength()
-        {
-            return (ReceiveQueue.Count);
-        }
+        public byte GeneralDequeue() { return ((byte)ReceiveQueue.Dequeue()); }
+        public int ReceiveQueueLength() { return (ReceiveQueue.Count); }
 
-        public int ReadDataIn(Byte[] inBuf, int Length)
+        private int EnqueueData(Byte[] inBuf, int Length)
         {
             try
             {
                 _SerialPortHandle.Read(inBuf, 0, Length);
+
                 for (int i = 0; i < Length; i++)
                     ReceiveQueue.Enqueue(inBuf[i]);
+
+                //Thread.Sleep(20);
             }
             catch (System.TimeoutException)
             {//Time out
@@ -152,17 +149,14 @@ namespace ModuleLayer
 
             return 1;
         }
-        public int GetRxBytes()
-        {
-            return (_SerialPortHandle.BytesToRead);
-        }
+
         public void Receive()
         {
-            int data_to_read = GetRxBytes();
-            if (data_to_read > 0)
+            int dataToRead = _SerialPortHandle.BytesToRead;
+            byte[] seriesOfData = new byte[dataToRead];
+            if (dataToRead > 0)
             {
-                byte[] dataset = new byte[data_to_read];
-                ReadDataIn(dataset, data_to_read);
+                EnqueueData(seriesOfData, dataToRead);
             }
         }
 
@@ -171,24 +165,26 @@ namespace ModuleLayer
         {
             SerialPort sp = (SerialPort)sender;
             int i, j;
-            byte[] InBuf = new byte[512];
-            //byte tempByte = new byte();
+            byte[] InBuf = new byte[bufferSize];
+
             try
             {
-                j = _SerialPortHandle.BytesToRead;
-                //j = sp.BytesToRead;
+                j = sp.BytesToRead;
                 byte[] tempBuf = new byte[j];
-                for (i = 0; i < j; j++)
+                for (i = 0; i < j; i++)
                 {
-                    tempBuf[i] = (byte)_SerialPortHandle.ReadByte();
+                    tempBuf[i] = (byte)sp.ReadByte();
                     //Console.Write("{0,2:X},", tempBuf[i]);
                     ReceiveQueue.Enqueue(tempBuf[i]);
                 }
 
+                sp.DiscardInBuffer();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                //sp.Close();
+                //sp.Dispose();
+                //log.Debug($"ReceiveDataEvent error!\n{ex}");
             }
         }
 
@@ -204,7 +200,7 @@ namespace ModuleLayer
                     string dataValue = sp.ReadLine(); 
                     if (dataValue.Contains("io i"))
                         GlobalData.Arduino_Read_String = dataValue;
-                    log.Debug("[" + sp + "] DataReceived: " + dataValue);
+                    //log.Debug($"[{sp}] DataReceived: {dataValue}");
 
                     int recByteCount = byteRead.Count();
                     if (recByteCount > 0)
@@ -216,14 +212,14 @@ namespace ModuleLayer
                 }
                 else
                 {
-                    log.Debug("[" + sp + "] Arduino serialport is not opened!");
-                    Console.WriteLine("Arduino serialport is not opened!");
+                    log.Debug($"[{sp}] Arduino serialport is not opened!");
                 }
             }
             catch (System.Exception ex)
             {
-                log.Debug("[" + sp + "] DataReceivedEvent error!");
-                Console.WriteLine(ex.Message, "DataReceivedEvent error!");
+                sp.Close();
+                sp.Dispose();
+                log.Debug($"DataReceivedEvent error!\n{ex}");
             }
         }
 
@@ -237,18 +233,6 @@ namespace ModuleLayer
                     _SerialPortHandle.BaudRate = int.Parse(port_BR);
                     _SerialPortHandle.DataBits = 8;
                     _SerialPortHandle.StopBits = StopBits.One;
-                    /*
-                    string stopbits = ini12.INIRead(GlobalData.MainSettingPath, "Port A", "StopBits", "");
-                    switch (stopbits)
-                    {
-                        case "One":
-                            _SerialPortHandle.StopBits = StopBits.One;
-                            break;
-                        case "Two":
-                            _SerialPortHandle.StopBits = StopBits.Two;
-                            break;
-                    }
-                    */
                     _SerialPortHandle.Handshake = Handshake.None;
                     _SerialPortHandle.Parity = Parity.None;
                     _SerialPortHandle.ReadTimeout = 2000;
@@ -256,13 +240,13 @@ namespace ModuleLayer
                     _SerialPortHandle.ReadBufferSize = 1024;
                     ReceiveQueue.Clear();
                     _SerialPortHandle.Open();
-                    Console.WriteLine("[Mod_RS232] " + _SerialPortHandle.PortName + " is successfully opened.");
 
+                    //log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
                     //_SerialPortHandle.DataReceived += new SerialDataReceivedEventHandler(ReceiveData);
                 }
                 else
                 {
-                    Console.WriteLine("[Mod_RS232] " + _SerialPortHandle.PortName + " is not yet opened.");
+                    //log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is not yet opened.");
                     return -3;
                 }
             }
@@ -276,7 +260,7 @@ namespace ModuleLayer
             }
             catch (Exception e)
             {
-                Console.WriteLine("[Mod_RS232]" + e.Message);
+                //log.Debug($"[Mod_RS232]\n{e}");
             }
 
             return 1;
@@ -299,13 +283,14 @@ namespace ModuleLayer
                     _SerialPortHandle.ReadBufferSize = 1024;
                     ReceiveQueue.Clear();
                     _SerialPortHandle.Open();
-                    Console.WriteLine("[Mod_RS232] " + _SerialPortHandle.PortName + " is successfully opened.");
+
+                    log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
                     //======= ARDUINO receives data by using ReceivedByEvent instead of Thread =======//
                     _SerialPortHandle.DataReceived += new SerialDataReceivedEventHandler(DataReceivedByEvent);
                 }
                 else
                 {
-                    Console.WriteLine("[Mod_RS232] " + _SerialPortHandle.PortName + " is not yet opened.");
+                    log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is not yet opened.");
                     return -3;
                 }
             }
@@ -319,7 +304,7 @@ namespace ModuleLayer
             }
             catch (Exception e)
             {
-                Console.WriteLine("[Mod_RS232]" + e.Message);
+                //log.Debug($"[Mod_RS232]\n{e}");
             }
 
             return 1;
@@ -329,20 +314,39 @@ namespace ModuleLayer
         {
             try
             {
-                int i = 0;
-                _SerialPortHandle.PortName = PortNumber;
-                _SerialPortHandle.BaudRate = BaudRate;
-                _SerialPortHandle.DataBits = DataLen;
-                _SerialPortHandle.StopBits = (StopBits)(StopBit);
-                _SerialPortHandle.Handshake = (Handshake)(i);
-                _SerialPortHandle.Parity = (Parity)(ParityBit);
-                _SerialPortHandle.ReadTimeout = 100;
-                _SerialPortHandle.WriteTimeout = 100;
-                _SerialPortHandle.ReadBufferSize = 1024;
-                ReceiveQueue.Clear();
-                _SerialPortHandle.Open();
-                //======= RS232 receives data by using Thread instead of ReceivedByEvent =======//
-                //_SerialPortHandle.DataReceived += new SerialDataReceivedEventHandler(ReceiveData);
+                if (_SerialPortHandle.IsOpen == false)
+                {
+                    
+                    int i = 0;
+                    _SerialPortHandle.PortName = PortNumber;
+                    _SerialPortHandle.BaudRate = BaudRate;
+                    _SerialPortHandle.DataBits = DataLen;
+                    _SerialPortHandle.StopBits = (StopBits)(StopBit);
+                    _SerialPortHandle.Handshake = (Handshake)(i);
+                    _SerialPortHandle.Parity = (Parity)(ParityBit);
+                    _SerialPortHandle.ReadTimeout = 100;
+                    _SerialPortHandle.WriteTimeout = 100;
+                    _SerialPortHandle.ReadBufferSize = 1024;
+                    ReceiveQueue.Clear();
+                    _SerialPortHandle.Open();
+                    log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
+                    Thread.Sleep(20);
+                    /*
+                    if (_SerialPortHandle.IsOpen)
+                    {
+                        readingThread = new Thread(DataReceiving);
+                        readingThread.Start();
+                        //readingThread.IsBackground = true;
+                    }
+                    */
+                    //======= RS232 receives data by using Thread instead of ReceivedByEvent =======//
+                    //_SerialPortHandle.DataReceived += new SerialDataReceivedEventHandler(ReceiveData);
+                }
+                else
+                {
+                    log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is not yet opened.");
+                    return -3;
+                }
             }
             catch (System.IO.IOException)
             {//Port number error
@@ -357,6 +361,7 @@ namespace ModuleLayer
 
         public int ClosePort()
         {
+            ReceiveQueue.Clear();
             _SerialPortHandle.Dispose();    //added by YFC
             _SerialPortHandle.Close();
 			

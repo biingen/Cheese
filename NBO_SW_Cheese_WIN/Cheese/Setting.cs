@@ -32,7 +32,7 @@ namespace Cheese
         {
             return (Convert.ToInt32((string)this.ComboBox_ByteCount.SelectedItem));
         }
-        public int getComPortParrityBit()
+        public int getComPortParity()
         {
             return (this.ComboBox_ParrityBit.SelectedIndex);
         }
@@ -40,6 +40,8 @@ namespace Cheese
         {
             return (Convert.ToInt32((string)this.ComboBox_StopBit.SelectedItem));
         }
+
+        #region -- TCP/IP --
         public int getNetworkChecked()
         {
             if (Network_checkBox.Checked == true)
@@ -59,6 +61,7 @@ namespace Cheese
         {
             return (Convert.ToInt32((string)this.textBox_Timeout.Text));
         }
+        #endregion
         public string getMailAddress()
         {
             return ((string)this.textBox_MailAddress.Text);
@@ -111,14 +114,23 @@ namespace Cheese
         {
             if (Comport_checkBox.Checked == true)
             {
-                SerialPort PortHandle = new SerialPort();
+                //SerialPort PortHandle = new SerialPort();
+                string portName = getComPortSetting();
+                int baudRate = Convert.ToInt32(getComPortBaudRate());
+                int parity = getComPortParity();
+                int dataLength = getComPortByteCount();
+                int stopBit = getComPortStopBit();
                 
-                PortHandle.PortName = (string)this.comboBox_Portname.SelectedItem;
+                //PortHandle.PortName = (string)this.comboBox_Portname.SelectedItem;
                 try
                 {
+                    if (!GlobalData.m_SerialPort.IsOpen())
+                        GlobalData.m_SerialPort.OpenPort(portName, baudRate, parity, dataLength, stopBit);
+                    /*
                     PortHandle.Open();
                     System.Threading.Thread.Sleep(1);
                     PortHandle.Close();
+                    */
                 }
                 catch (Exception)
                 {
