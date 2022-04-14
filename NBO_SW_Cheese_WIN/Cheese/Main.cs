@@ -78,7 +78,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.009";
+            this.VerLabel.Text = "Version: 00.00.010";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -630,15 +630,14 @@ namespace Cheese
                                     byte[] cmdBytes = new byte[CmdStringArray.Count() + 1];     //Plus 1 is reserved for checksum Byte
                                     var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
                                     GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
-
-                                    
                                 }
                                 else if (columns_function == "GENERAL" || columns_function == "BENQ")
                                 {
                                     byte[] cmdBytes = new byte[columns_cmdLine.Count()];
                                     cmdBytes = dataConv.StrToByte(columns_cmdLine);
                                     GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
-                                    Thread.Sleep(1000);     //wait long enough to receive serialport data
+                                    Task.Delay(2000).Wait();     //delay long enough by a Task to receive serialport data
+                                    //Thread.Sleep(2000) is not a suggested way;
                                     Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.Measure_Backlight);
                                     Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Measure_Thermal);
                                 }
@@ -846,12 +845,19 @@ namespace Cheese
                         }
                         else if (columns_command == "_Arduino_Output")
                         {
-                            string GPIO_string = columns_times;
-                            byte GPIO_B = Convert.ToByte(GPIO_string, 2);
-                            if ((GPIO_B & 0x02) == 0x00)
+                            string GPIO_string = columns_cmdLine;
+                            byte GPIO_B = 0x00; // = Convert.ToByte(GPIO_string, 2);
+                            //if ((GPIO_B & 0x02) == 0x00)
+                            if (GPIO_string == "OFF" || GPIO_string == "Off" || GPIO_string == "off")
+                            {
                                 GlobalData.Arduino_relay_status = false;
-                            else
+                                GPIO_B = 0x00;
+                            }
+                            else if (GPIO_string == "ON" || GPIO_string == "On" || GPIO_string == "on")
+                            {
                                 GlobalData.Arduino_relay_status = true;
+                                GPIO_B = 0x02;
+                            }
                             Arduino_Set_GPIO_Output(GPIO_B, 100);
 
                             delayTime = Convert.ToInt32(columns_wait);
@@ -1929,7 +1935,8 @@ namespace Cheese
                     {
                         //serialPort_Arduino.WriteLine(dataValue);
                         GlobalData.sp_Arduino.WriteDataOut(dataString, dataString.Length);
-                        Thread.Sleep(delay_time);
+                        Task.Delay(delay_time).Wait();
+                        //Thread.Sleep(delay_time);
 
                         serial_receive = GlobalData.Arduino_recFlag;
                         if (serial_receive && retry_cnt == 0)
@@ -2043,19 +2050,20 @@ namespace Cheese
                     Invoke(UpdateUIBtn, 1, 1);  //this.BTN_Pause.Enabled = true;
                     //Invoke(UpdateUIBtn, 2, 1);  //this.BTN_Stop.Enabled = true;
                     Invoke(UpdateUIBtn, 9, 0);  //cboxCameraList.Enabled = false;
-                                                //Invoke(LoopText, 0, 0);
-                                                //FlagPause = 0;
+                    //Invoke(LoopText, 0, 0);
+                    //FlagPause = 0;
                     if (!ExecuteCmd_Thread.IsAlive)
                         ExecuteCmd_Thread.Start();
-
                     //Console.WriteLine("Playing");
                     //Console.WriteLine("Thread ID = {0}", ExecuteCmd_Thread.ManagedThreadId.ToString());
-                    //SerialPort_Receive_Thread.IsBackground = true;
 
                     if (!SerialPort_Receive_Thread.IsAlive)
                         SerialPort_Receive_Thread.Start();
-                        
-                    Invoke(UpdateUIBtn, 10, 0); //this.BTN_StartTest.Image = global::Cheese.ImageResource.stop;
+                    //SerialPort_Receive_Thread.IsBackground = true;
+                    //Console.WriteLine("Listening");
+                    //Console.WriteLine("Thread ID = {0}", SerialPort_Receive_Thread.ManagedThreadId.ToString());
+
+                    Invoke(UpdateUIBtn, 10, 0);     //this.BTN_StartTest.Image = global::Cheese.ImageResource.stop;
                     //FlagStop = 0;
                     lock(this)
                     {
@@ -2090,7 +2098,6 @@ namespace Cheese
                     //Console.WriteLine("Stopping");
                     //Console.WriteLine("Thread ID = {0}", ExecuteCmd_Thread.ManagedThreadId.ToString());
                     //Console.WriteLine("Thread ID = {0}", SerialPort_Receive_Thread.ManagedThreadId.ToString());
-                    //Console.WriteLine("Thread ID = {0}", SerialPort_CmdHandling_Thread.ManagedThreadId.ToString());
 
                     Invoke(UpdateUIBtn, 10, 1); //this.BTN_StartTest.Image = global::Cheese.ImageResource.play_button;
                     Invoke(UpdateUIBtn, 0, 1);  //this.BTN_StartTest.Enabled = true;
@@ -2393,7 +2400,7 @@ namespace Cheese
                         GlobalData.Measure_Backlight = Encoding.ASCII.GetString(queueBuffer);
                         GlobalData.Measure_Thermal = byteToString;
                     }
-                    Thread.Sleep(1000);
+                    Task.Delay(1000).Wait();
                 }
             }
         }
