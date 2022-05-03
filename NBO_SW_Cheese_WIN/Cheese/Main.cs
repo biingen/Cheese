@@ -78,7 +78,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.012";
+            this.VerLabel.Text = "Version: 00.00.013";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -599,7 +599,7 @@ namespace Cheese
                         #region -- Schedule for ASCII W/R --
                         else if ((columns_command == "_ASCII") || (columns_command == "_ascii"))
                         {
-                            GlobalData.m_SerialPort.WriteDataOut(columns_cmdLine, columns_cmdLine.Length);
+                            GlobalData.m_SerialPort_A.WriteDataOut(columns_cmdLine, columns_cmdLine.Length);
                             Thread.Sleep(50);
                             Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedRaw);
                             //GetSerialData(GlobalData.m_SerialPort_A);
@@ -617,7 +617,7 @@ namespace Cheese
                         else if ((columns_command == "_HEX") || (columns_command == "_HEX_R"))
                         {
                             // ----------------------- Process data string from csv file ----------------------- //
-                            if (columns_command == "_HEX")
+                            if (columns_command == "_HEX" || columns_comport != "")
                             {
                                 //calculate CRC field
                                 if (columns_function == "XOR8")
@@ -625,29 +625,109 @@ namespace Cheese
                                     cmdString = columns_cmdLine;
                                     byte[] cmdBytes = new byte[CmdStringArray.Count() + 1];     //Plus 1 is reserved for checksum Byte
                                     var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
-                                    GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                    GlobalData.m_SerialPort_A.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                }
+                                else if (columns_function == "MOD256")
+                                {
+                                    string cmdLineString = columns_cmdLine, chksumStr = "";
+                                    string[] hexValuesSplit = cmdLineString.Split(' ');
+                                    byte[] cmdBytes = new byte[hexValuesSplit.Count()];
+                                    if (hexValuesSplit[0] == "42" && hexValuesSplit[hexValuesSplit.Count() - 1] == "51")
+                                        chksumStr = dataConv.BenQ_Mod256(ref cmdLineString, hexValuesSplit, cmdBytes);
+
+                                    if (columns_comport == "A")
+                                    {
+                                        GlobalData.m_SerialPort_A.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();    //delay long enough by a Task to receive serialport data
+                                        //Thread.Sleep(2000) is not a suggested way;
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw);
+                                        Invoke(WriteDataGrid, 12, ExeIndex, cmdLineString);
+                                    }
+                                    else if (columns_comport == "B")
+                                    {
+                                        GlobalData.m_SerialPort_B.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_B);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_B);
+                                        Invoke(WriteDataGrid, 12, ExeIndex, cmdLineString);
+                                    }
+                                    else if (columns_comport == "C")
+                                    {
+                                        GlobalData.m_SerialPort_C.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_C);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_C);
+                                    }
+                                    else if (columns_comport == "D")
+                                    {
+                                        GlobalData.m_SerialPort_D.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_D);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_D);
+                                    }
+                                    else if (columns_comport == "E")
+                                    {
+                                        GlobalData.m_SerialPort_E.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_E);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_E);
+                                    }
+                                    //end of else if (columns_function == "GENERAL" || columns_function == "BENQ")
                                 }
                                 else if (columns_function == "GENERAL" || columns_function == "BENQ")
                                 {
                                     byte[] cmdBytes = new byte[columns_cmdLine.Count()];
                                     cmdBytes = dataConv.StrToByte(columns_cmdLine);
-                                    GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
-                                    Task.Delay(2000).Wait();     //delay long enough by a Task to receive serialport data
-                                    //Thread.Sleep(2000) is not a suggested way;
-                                    Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii);
-                                    Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw);
+                                    if (columns_comport == "A")
+                                    {
+                                        GlobalData.m_SerialPort_A.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();    //delay long enough by a Task to receive serialport data
+                                        //Thread.Sleep(2000) is not a suggested way;
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw);
+                                    }
+                                    else if (columns_comport == "B")
+                                    {
+                                        GlobalData.m_SerialPort_B.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_B);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_B);
+                                    }
+                                    else if (columns_comport == "C")
+                                    {
+                                        GlobalData.m_SerialPort_C.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_C);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_C);
+                                    }
+                                    else if (columns_comport == "D")
+                                    {
+                                        GlobalData.m_SerialPort_D.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_D);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_D);
+                                    }
+                                    else if (columns_comport == "E")
+                                    {
+                                        GlobalData.m_SerialPort_E.WriteDataOut(cmdBytes, cmdBytes.Length);
+                                        Task.Delay(2000).Wait();
+                                        Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii_E);
+                                        Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw_E);
+                                    }
+                                    //end of else if (columns_function == "GENERAL" || columns_function == "BENQ")
                                 }
                             }
 
                             if (columns_command == "_HEX_R")
                             {
-                                int rxLength = GlobalData.m_SerialPort.ReceiveQueueLength();
+                                int rxLength = GlobalData.m_SerialPort_A.ReceiveQueueLength();
 
                                 if (columns_function == "XOR8")
                                 {
                                     for (int index = 0; index < rxLength; index++)
                                     {
-                                        GlobalData.returnBytes[index] = GlobalData.m_SerialPort.GeneralDequeue();
+                                        GlobalData.returnBytes[index] = GlobalData.m_SerialPort_A.GeneralDequeue();
                                         resultLine += GlobalData.returnBytes[index].ToString("X2").PadLeft(2, '0');
                                         if (index != (rxLength - 1))
                                             resultLine += ' ';
@@ -1836,7 +1916,7 @@ namespace Cheese
 					Invoke(LoopText, 3, loopRemaining);
                 }
                 //----------------------------------------------------//
-                MessageBox.Show("All schedules finished");
+                MessageBox.Show("All schedules finished", "Info");
                 //CloseCamera();
                 //UpdateUIBtn(3, 3);        //display finish
                 Invoke(UpdateUIBtn, 3, 3);  //display finish
@@ -2038,6 +2118,10 @@ namespace Cheese
             //ProcessLoopText LoopText = new ProcessLoopText(UpdateLoopTxt);
             Thread ExecuteCmd_Thread = new Thread(new ThreadStart(ExecuteCmd));
             Thread SerialPort_Receive_Thread = new Thread(new ThreadStart(SerialRxThread));
+            Thread SerialPort_Receive_Thread_B = new Thread(new ThreadStart(SerialRxThread_ComB));
+            Thread SerialPort_Receive_Thread_C = new Thread(new ThreadStart(SerialRxThread_ComC));
+            Thread SerialPort_Receive_Thread_D = new Thread(new ThreadStart(SerialRxThread_ComD));
+            Thread SerialPort_Receive_Thread_E = new Thread(new ThreadStart(SerialRxThread_ComE));
             //Thread SerialPort_CmdHandling_Thread = new Thread(new ThreadStart(SerialPort_Cmd_Handling));
 
             //if (playBtnPressed == false && GlobalData.m_SerialPort.IsOpen())
@@ -2058,6 +2142,14 @@ namespace Cheese
 
                     if (!SerialPort_Receive_Thread.IsAlive)
                         SerialPort_Receive_Thread.Start();
+                    if (!SerialPort_Receive_Thread_B.IsAlive)
+                        SerialPort_Receive_Thread_B.Start();
+                    if (!SerialPort_Receive_Thread_C.IsAlive)
+                        SerialPort_Receive_Thread_C.Start();
+                    if (!SerialPort_Receive_Thread_D.IsAlive)
+                        SerialPort_Receive_Thread_D.Start();
+                    if (!SerialPort_Receive_Thread_E.IsAlive)
+                        SerialPort_Receive_Thread_E.Start();
                     //SerialPort_Receive_Thread.IsBackground = true;
                     //Console.WriteLine("Listening");
                     //Console.WriteLine("Thread ID = {0}", SerialPort_Receive_Thread.ManagedThreadId.ToString());
@@ -2090,6 +2182,14 @@ namespace Cheese
                     
                     if (SerialPort_Receive_Thread.IsAlive)
                         SerialPort_Receive_Thread.Abort();
+					if (SerialPort_Receive_Thread_B.IsAlive)
+                        SerialPort_Receive_Thread_B.Abort();
+					if (SerialPort_Receive_Thread_C.IsAlive)
+                        SerialPort_Receive_Thread_C.Abort();
+					if (SerialPort_Receive_Thread_D.IsAlive)
+                        SerialPort_Receive_Thread_D.Abort();
+					if (SerialPort_Receive_Thread_E.IsAlive)
+                        SerialPort_Receive_Thread_E.Abort();
                     /*
                     if (SerialPort_CmdHandling_Thread.IsAlive)
                         SerialPort_CmdHandling_Thread.Abort();
@@ -2254,12 +2354,31 @@ namespace Cheese
                 UINetworkLED.Invoke(0);
             }
 
-            if (GlobalData.m_SerialPort.IsOpen())
+            if (GlobalData.m_SerialPort_A.IsOpen())
             {
-                GlobalData.m_SerialPort.ClosePort();
+                GlobalData.m_SerialPort_A.ClosePort(GlobalData.m_SerialPort_A);
                 UILED.Invoke(0);
             }
-
+            if (GlobalData.m_SerialPort_B.IsOpen())
+            {
+                GlobalData.m_SerialPort_B.ClosePort(GlobalData.m_SerialPort_B);
+                UILED.Invoke(0);
+            }
+            if (GlobalData.m_SerialPort_C.IsOpen())
+            {
+                GlobalData.m_SerialPort_C.ClosePort(GlobalData.m_SerialPort_C);
+                UILED.Invoke(0);
+            }
+            if (GlobalData.m_SerialPort_D.IsOpen())
+            {
+                GlobalData.m_SerialPort_D.ClosePort(GlobalData.m_SerialPort_D);
+                UILED.Invoke(0);
+            }
+            if (GlobalData.m_SerialPort_E.IsOpen())
+            {
+                GlobalData.m_SerialPort_E.ClosePort(GlobalData.m_SerialPort_E);
+                UILED.Invoke(0);
+            }
             /*
             if (GlobalData.sp_Arduino.IsOpen())
             {
@@ -2289,7 +2408,8 @@ namespace Cheese
                 //if (ComportStatus == 1)
                 {
                     //if (GlobalData.m_SerialPort.OpenPort(PortNumber, BaudRate, ParityBit, DataLen, StopBit) >= 1)
-                    if (GlobalData.m_SerialPort.IsOpen())
+                    if (GlobalData.m_SerialPort_A.IsOpen() || GlobalData.m_SerialPort_B.IsOpen() || GlobalData.m_SerialPort_C.IsOpen()
+                         || GlobalData.m_SerialPort_D.IsOpen() || GlobalData.m_SerialPort_E.IsOpen())
                     {
                         UILED.Invoke(1);
                     }
@@ -2325,6 +2445,19 @@ namespace Cheese
                         MessageBox.Show("Open Socket fail.");
                     }
                 }
+            }
+            else if (form2.DialogResult == System.Windows.Forms.DialogResult.Cancel)
+            {
+                if (GlobalData.m_SerialPort_A.IsOpen())
+                    GlobalData.m_SerialPort_A.ClosePort(GlobalData.m_SerialPort_A);
+                if (GlobalData.m_SerialPort_B.IsOpen())
+                    GlobalData.m_SerialPort_B.ClosePort(GlobalData.m_SerialPort_B);
+                if (GlobalData.m_SerialPort_C.IsOpen())
+                    GlobalData.m_SerialPort_C.ClosePort(GlobalData.m_SerialPort_C);
+                if (GlobalData.m_SerialPort_D.IsOpen())
+                    GlobalData.m_SerialPort_D.ClosePort(GlobalData.m_SerialPort_D);
+                if (GlobalData.m_SerialPort_E.IsOpen())
+                    GlobalData.m_SerialPort_E.ClosePort(GlobalData.m_SerialPort_E);
             }
         }
 
@@ -2370,19 +2503,19 @@ namespace Cheese
         public void SerialRxThread()
         {
             //GetSerialData(GlobalData.m_SerialPort);
-            while (GlobalData.m_SerialPort.IsOpen())
+            while (GlobalData.m_SerialPort_A.IsOpen())
             {
-                GlobalData.m_SerialPort.Receive();
+                GlobalData.m_SerialPort_A.Receive();
 
                 //while (playState)
                 {
-                    while (GlobalData.m_SerialPort.ReceiveQueue.Count > 0)
+                    while (GlobalData.m_SerialPort_A.ReceiveQueue.Count > 0)
                     {
-                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort.ReceiveQueue.Count];
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort_A.ReceiveQueue.Count];
                         string byteToString = "";
                         for (int i = 0; i < queueBuffer.Length; i++)
                         {
-                            queueBuffer[i] = GlobalData.m_SerialPort.GeneralDequeue();
+                            queueBuffer[i] = GlobalData.m_SerialPort_A.GeneralDequeue();
                             if (i < queueBuffer.Length - 1)
                                 byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
                             else if (i == queueBuffer.Length - 1)
@@ -2402,6 +2535,121 @@ namespace Cheese
             }
         }
 
+        public void SerialRxThread_ComB()
+        {
+            while (GlobalData.m_SerialPort_B.IsOpen())
+            {
+                GlobalData.m_SerialPort_B.Receive();
+
+                //while (playState)
+                {
+                    while (GlobalData.m_SerialPort_B.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort_B.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort_B.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                        }
+
+                        GlobalData.RS232_receivedRaw_B = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.RS232_receivedAscii_B = byteToString;
+                    }
+                    Task.Delay(1000).Wait();
+                }
+            }
+        }
+
+        public void SerialRxThread_ComC()
+        {
+            while (GlobalData.m_SerialPort_C.IsOpen())
+            {
+                GlobalData.m_SerialPort_C.Receive();
+
+                //while (playState)
+                {
+                    while (GlobalData.m_SerialPort_C.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort_C.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort_C.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                        }
+
+                        GlobalData.RS232_receivedRaw_C = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.RS232_receivedAscii_C = byteToString;
+                    }
+                    Task.Delay(1000).Wait();
+                }
+            }
+        }
+
+        public void SerialRxThread_ComD()
+        {
+            while (GlobalData.m_SerialPort_D.IsOpen())
+            {
+                GlobalData.m_SerialPort_D.Receive();
+
+                //while (playState)
+                {
+                    while (GlobalData.m_SerialPort_D.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort_D.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort_D.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                        }
+
+                        GlobalData.RS232_receivedRaw_D = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.RS232_receivedAscii_D = byteToString;
+                    }
+                    Task.Delay(1000).Wait();
+                }
+            }
+        }
+
+        public void SerialRxThread_ComE()
+        {
+            while (GlobalData.m_SerialPort_E.IsOpen())
+            {
+                GlobalData.m_SerialPort_E.Receive();
+
+                //while (playState)
+                {
+                    while (GlobalData.m_SerialPort_E.ReceiveQueue.Count > 0)
+                    {
+                        byte[] queueBuffer = new byte[GlobalData.m_SerialPort_E.ReceiveQueue.Count];
+                        string byteToString = "";
+                        for (int i = 0; i < queueBuffer.Length; i++)
+                        {
+                            queueBuffer[i] = GlobalData.m_SerialPort_E.GeneralDequeue();
+                            if (i < queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0') + " ";
+                            else if (i == queueBuffer.Length - 1)
+                                byteToString += queueBuffer[i].ToString("X2").PadLeft(2, '0');
+                        }
+
+                        GlobalData.RS232_receivedRaw_E = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.RS232_receivedAscii_E = byteToString;
+                    }
+                    Task.Delay(1000).Wait();
+                }
+            }
+        }
         private void SerialPort_Cmd_Handling()
         {
                 /*while (playState)
@@ -2705,10 +2953,18 @@ namespace Cheese
         {
             CloseCamera();
             if (GlobalData.sp_Arduino.IsOpen())
-                GlobalData.sp_Arduino.ClosePort();
-            
-            if (GlobalData.m_SerialPort.IsOpen())
-                GlobalData.m_SerialPort.ClosePort();
+                GlobalData.sp_Arduino.ClosePort(GlobalData.sp_Arduino);
+
+            if (GlobalData.m_SerialPort_A.IsOpen())
+                GlobalData.m_SerialPort_A.ClosePort(GlobalData.m_SerialPort_A);
+            if (GlobalData.m_SerialPort_B.IsOpen())
+                GlobalData.m_SerialPort_B.ClosePort(GlobalData.m_SerialPort_B);
+            if (GlobalData.m_SerialPort_C.IsOpen())
+                GlobalData.m_SerialPort_C.ClosePort(GlobalData.m_SerialPort_C);
+            if (GlobalData.m_SerialPort_D.IsOpen())
+                GlobalData.m_SerialPort_D.ClosePort(GlobalData.m_SerialPort_D);
+            if (GlobalData.m_SerialPort_E.IsOpen())
+                GlobalData.m_SerialPort_E.ClosePort(GlobalData.m_SerialPort_E);
 
             /*  Thread resource collection is aleady hadnled by VS system
             if (ExecuteCmd_Thread != null)

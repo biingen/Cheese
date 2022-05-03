@@ -361,11 +361,34 @@ namespace ModuleLayer
             return 1;
         }
 
-        public int ClosePort()
+        public int ClosePort(object sender)
         {
             ReceiveQueue.Clear();
-            GlobalData.RS232_receivedRaw = "";
-            GlobalData.RS232_receivedAscii = "";
+            if (sender == GlobalData.m_SerialPort_A)
+            {
+                GlobalData.RS232_receivedRaw = "";
+                GlobalData.RS232_receivedAscii = "";
+            }
+            if (sender == GlobalData.m_SerialPort_B)
+            {
+                GlobalData.RS232_receivedRaw_B = "";
+                GlobalData.RS232_receivedAscii_B = "";
+            }
+            if (sender == GlobalData.m_SerialPort_C)
+            {
+                GlobalData.RS232_receivedRaw_C = "";
+                GlobalData.RS232_receivedAscii_C = "";
+            }
+            if (sender == GlobalData.m_SerialPort_D)
+            {
+                GlobalData.RS232_receivedRaw_D = "";
+                GlobalData.RS232_receivedAscii_D = "";
+            }
+            if (sender == GlobalData.m_SerialPort_E)
+            {
+                GlobalData.RS232_receivedRaw_E = "";
+                GlobalData.RS232_receivedAscii_E = "";
+            }
             _SerialPortHandle.Dispose();    //added by YFC
             _SerialPortHandle.Close();
 			

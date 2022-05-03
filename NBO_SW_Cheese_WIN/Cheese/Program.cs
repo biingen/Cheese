@@ -52,7 +52,11 @@ namespace Cheese
         public static string RcSettingPath = Application.StartupPath + "\\RC.ini";
         public static string StartupPath = Application.StartupPath;
 
-        public static Mod_RS232 m_SerialPort = new Mod_RS232();
+        public static Mod_RS232 m_SerialPort_A = new Mod_RS232();
+        public static Mod_RS232 m_SerialPort_B = new Mod_RS232();
+        public static Mod_RS232 m_SerialPort_C = new Mod_RS232();
+        public static Mod_RS232 m_SerialPort_D = new Mod_RS232();
+        public static Mod_RS232 m_SerialPort_E = new Mod_RS232();
         public static Mod_RS232 sp_Arduino = new Mod_RS232();
         public static FTDI_Lib Ftdi_lib = new FTDI_Lib();
         public static PortInfo portinfo = new PortInfo();
@@ -107,6 +111,14 @@ namespace Cheese
         public static string RS232_chksumByte = "";
         public static string RS232_receivedRaw = "";
         public static string RS232_receivedAscii = "";
+        public static string RS232_receivedRaw_B = "";
+        public static string RS232_receivedAscii_B = "";
+        public static string RS232_receivedRaw_C = "";
+        public static string RS232_receivedAscii_C = "";
+        public static string RS232_receivedRaw_D = "";
+        public static string RS232_receivedAscii_D = "";
+        public static string RS232_receivedRaw_E = "";
+        public static string RS232_receivedAscii_E = "";
         public static string RS232_sentText = "";
         public static string Measure_Backlight = "";
         public static string Measure_Thermal = "";
