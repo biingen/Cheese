@@ -214,20 +214,69 @@ namespace ModuleLayer
             return XOR_calu;
         }
 
+        public string BenQ_Mod256(ref string original_data, string[] strArr, byte[] cmdBytes)
+        {
+            log.Debug("Mod256: " + original_data);
+            string chksum = "", tstStr = "";
+            int hex_number = 0, sumOfData = 0;
+            try
+            {
+                foreach (string hex in strArr)
+                {
+                    byte byteValue = 0x00;
+                    if (hex != "XX")
+                        byteValue = Convert.ToByte(Convert.ToInt32(hex, 16));
+                    else if (hex == "XX")
+                        byteValue = 0x00;
+                    
+                    cmdBytes[hex_number++] = byteValue;
+                }
+                //Length Byte
+                int lenValue = cmdBytes[1];
+                int dataMaxIndex = lenValue - 4;
+                for (int i = 2; i <= (dataMaxIndex + 1); i++)
+                {
+                    sumOfData += cmdBytes[i];
+                }
+
+                sumOfData %= 256;
+                cmdBytes[hex_number - 2] = (byte)sumOfData;
+                chksum = sumOfData.ToString("X2").PadLeft(2, '0');
+                int cnt = 0;
+                foreach (var bt in cmdBytes)
+                {
+                    if (cnt < cmdBytes.Length - 1)
+                        tstStr += bt.ToString("X2").PadLeft(2, '0') + " ";
+                    else if (cnt == cmdBytes.Length - 1)
+                        tstStr += bt.ToString("X2").PadLeft(2, '0');
+                    cnt++;
+                }
+                original_data = tstStr;
+            }
+            catch (OverflowException)
+            {
+                MessageBox.Show("Please check HEX command format.", "Format error");
+            }
+            
+            return chksum;
+        }
+
         public string XOR8_BytesWithChksum(string original_data, byte[] BytesToBeWritten, int BytesLength, bool withChksum = false)
         {
             log.Debug("XOR8_BytesWithChksum: " + original_data + ", " + BytesToBeWritten + ", " + BytesLength + ", " + withChksum);
             string[] hexValuesSplit = original_data.Split(' ');
-            byte XOR_value = new byte();
+            byte XOR_value = new byte(), byteValue;
             int hex_number = 0;
             try
             {
                 foreach (string hex in hexValuesSplit)          //turn into Byte array
                 {
                     // Convert the number expressed in base-16 to an integer.
-                    byte number = Convert.ToByte(Convert.ToInt32(hex, 16));
-                    // Get the character corresponding to the integral value.
-                    BytesToBeWritten[hex_number++] = number;
+                    if (hex != "XX")
+                        byteValue = Convert.ToByte(Convert.ToInt32(hex, 16));
+                    else if (hex == "XX")
+                        byteValue = 0x00;
+
                     if (hex_number > 0)
                         XOR_value = XOR(BytesToBeWritten[hex_number - 1], XOR_value);
                 }

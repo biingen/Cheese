@@ -119,7 +119,7 @@ namespace Cheese
                         int ArduinoPortLengh = ArduinoPort.Length;
                         string ArduinoPortFinal = ArduinoPort.Remove(ArduinoPortLengh - 1);
                         GlobalData.Arduino_Comport = ArduinoPortFinal;
-
+                        
                         if (ArduinoPortSubstring.Substring(0, 3) == "COM")
                         {
                             ini12.INIWrite(GlobalData.MainSettingPath, "Device", "ArduinoExist", "1");

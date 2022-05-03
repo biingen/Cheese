@@ -34,11 +34,25 @@
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label1 = new System.Windows.Forms.Label();
             this.VerLabel = new System.Windows.Forms.Label();
             this.chkBox_LoopTimes = new System.Windows.Forms.CheckBox();
             this.Txt_LoopTimes = new System.Windows.Forms.TextBox();
-            this.Label_LoopCounter = new System.Windows.Forms.Label();
+            this.Label_LoopRemain = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.cboxCameraList = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -47,7 +61,7 @@
             this.button_Camera = new System.Windows.Forms.Button();
             this.button_AcOn = new System.Windows.Forms.Button();
             this.button_AcOff = new System.Windows.Forms.Button();
-            this.Txt_LoopCounter = new System.Windows.Forms.TextBox();
+            this.Txt_LoopRemain = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.textBox_cam2Res = new System.Windows.Forms.TextBox();
             this.textBox_cam1Res = new System.Windows.Forms.TextBox();
@@ -66,20 +80,6 @@
             this.BTN_StartTest = new System.Windows.Forms.Button();
             this.PIC_FTDI = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
@@ -110,7 +110,7 @@
             this.toolStripButton1.Image = global::Cheese.ImageResource.open_file;
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(81, 24);
+            this.toolStripButton1.Size = new System.Drawing.Size(85, 24);
             this.toolStripButton1.Text = "Open File";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
@@ -119,7 +119,7 @@
             this.toolStripButton2.Image = global::Cheese.ImageResource.tools;
             this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(68, 24);
+            this.toolStripButton2.Size = new System.Drawing.Size(71, 24);
             this.toolStripButton2.Text = "Setting";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
@@ -128,7 +128,7 @@
             this.toolStripButton3.Image = global::Cheese.ImageResource.save_file;
             this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(76, 24);
+            this.toolStripButton3.Size = new System.Drawing.Size(80, 24);
             this.toolStripButton3.Text = "Save File";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
@@ -137,7 +137,7 @@
             this.toolStripButton4.Image = global::Cheese.ImageResource.tools;
             this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Size = new System.Drawing.Size(90, 24);
+            this.toolStripButton4.Size = new System.Drawing.Size(95, 24);
             this.toolStripButton4.Text = "Open GPIO";
             this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
             // 
@@ -165,6 +165,116 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(1172, 480);
             this.dataGridView1.TabIndex = 1;
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "CMD Type";
+            this.Column1.Name = "Column1";
+            this.Column1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column1.Width = 90;
+            // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "Times";
+            this.Column2.Name = "Column2";
+            this.Column2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column2.Width = 50;
+            // 
+            // Column3
+            // 
+            this.Column3.HeaderText = "Interval";
+            this.Column3.Name = "Column3";
+            this.Column3.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column3.Width = 50;
+            // 
+            // Column4
+            // 
+            this.Column4.HeaderText = "PIN";
+            this.Column4.Name = "Column4";
+            this.Column4.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column4.Width = 50;
+            // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "Function";
+            this.Column5.Name = "Column5";
+            this.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column5.Width = 80;
+            // 
+            // Column6
+            // 
+            this.Column6.HeaderText = "Sub-function";
+            this.Column6.Name = "Column6";
+            this.Column6.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column6.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column6.Width = 80;
+            // 
+            // Column7
+            // 
+            this.Column7.HeaderText = "Output String";
+            this.Column7.Name = "Column7";
+            this.Column7.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column7.Width = 220;
+            // 
+            // Column8
+            // 
+            this.Column8.HeaderText = "AC/USB_Switch";
+            this.Column8.Name = "Column8";
+            this.Column8.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column8.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column8.Width = 80;
+            // 
+            // Column9
+            // 
+            this.Column9.HeaderText = "Delay(ms)";
+            this.Column9.Name = "Column9";
+            this.Column9.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column9.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column9.Width = 60;
+            // 
+            // Column10
+            // 
+            this.Column10.HeaderText = "CMD Description";
+            this.Column10.Name = "Column10";
+            this.Column10.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column10.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column10.Width = 120;
+            // 
+            // Column11
+            // 
+            this.Column11.HeaderText = "Reply String";
+            this.Column11.Name = "Column11";
+            this.Column11.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column11.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column11.Width = 150;
+            // 
+            // Column12
+            // 
+            this.Column12.HeaderText = "Result_1";
+            this.Column12.Name = "Column12";
+            this.Column12.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column12.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Column12.Width = 150;
+            // 
+            // Column13
+            // 
+            this.Column13.HeaderText = "Result_2";
+            this.Column13.Name = "Column13";
+            this.Column13.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column13.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // Column14
+            // 
+            this.Column14.HeaderText = "Judge";
+            this.Column14.Name = "Column14";
+            this.Column14.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Column14.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // label1
             // 
@@ -210,15 +320,15 @@
             this.Txt_LoopTimes.Text = "1";
             this.Txt_LoopTimes.TextChanged += new System.EventHandler(this.Txt_LoopTimes_TextChanged);
             // 
-            // Label_LoopCounter
+            // Label_LoopRemain
             // 
-            this.Label_LoopCounter.AutoSize = true;
-            this.Label_LoopCounter.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_LoopCounter.Location = new System.Drawing.Point(416, 615);
-            this.Label_LoopCounter.Name = "Label_LoopCounter";
-            this.Label_LoopCounter.Size = new System.Drawing.Size(136, 23);
-            this.Label_LoopCounter.TabIndex = 11;
-            this.Label_LoopCounter.Text = "Loop Remaining";
+            this.Label_LoopRemain.AutoSize = true;
+            this.Label_LoopRemain.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Label_LoopRemain.Location = new System.Drawing.Point(416, 615);
+            this.Label_LoopRemain.Name = "Label_LoopRemain";
+            this.Label_LoopRemain.Size = new System.Drawing.Size(136, 23);
+            this.Label_LoopRemain.TabIndex = 11;
+            this.Label_LoopRemain.Text = "Loop Remaining";
             // 
             // label2
             // 
@@ -279,7 +389,6 @@
             // 
             // button_Camera
             // 
-            this.button_Camera.Enabled = false;
             this.button_Camera.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button_Camera.Location = new System.Drawing.Point(12, 574);
             this.button_Camera.Name = "button_Camera";
@@ -312,15 +421,15 @@
             this.button_AcOff.UseVisualStyleBackColor = true;
             this.button_AcOff.Click += new System.EventHandler(this.button_AcOff_Click);
             // 
-            // Txt_LoopCounter
+            // Txt_LoopRemain
             // 
-            this.Txt_LoopCounter.Enabled = false;
-            this.Txt_LoopCounter.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Txt_LoopCounter.Location = new System.Drawing.Point(558, 615);
-            this.Txt_LoopCounter.Name = "Txt_LoopCounter";
-            this.Txt_LoopCounter.Size = new System.Drawing.Size(79, 26);
-            this.Txt_LoopCounter.TabIndex = 32;
-            this.Txt_LoopCounter.Text = "1";
+            this.Txt_LoopRemain.Enabled = false;
+            this.Txt_LoopRemain.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Txt_LoopRemain.Location = new System.Drawing.Point(558, 615);
+            this.Txt_LoopRemain.Name = "Txt_LoopRemain";
+            this.Txt_LoopRemain.Size = new System.Drawing.Size(79, 26);
+            this.Txt_LoopRemain.TabIndex = 32;
+            this.Txt_LoopRemain.Text = "1";
             // 
             // panel1
             // 
@@ -506,116 +615,6 @@
             this.label4.TabIndex = 39;
             this.label4.Text = "FTDI Status";
             // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "CMD Type";
-            this.Column1.Name = "Column1";
-            this.Column1.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column1.Width = 90;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Times";
-            this.Column2.Name = "Column2";
-            this.Column2.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column2.Width = 50;
-            // 
-            // Column3
-            // 
-            this.Column3.HeaderText = "Interval";
-            this.Column3.Name = "Column3";
-            this.Column3.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column3.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column3.Width = 50;
-            // 
-            // Column4
-            // 
-            this.Column4.HeaderText = "PIN";
-            this.Column4.Name = "Column4";
-            this.Column4.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column4.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column4.Width = 50;
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Function";
-            this.Column5.Name = "Column5";
-            this.Column5.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column5.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column5.Width = 80;
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Sub-function";
-            this.Column6.Name = "Column6";
-            this.Column6.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column6.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column6.Width = 80;
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Output String";
-            this.Column7.Name = "Column7";
-            this.Column7.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column7.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column7.Width = 220;
-            // 
-            // Column8
-            // 
-            this.Column8.HeaderText = "AC/USB_Switch";
-            this.Column8.Name = "Column8";
-            this.Column8.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column8.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column8.Width = 80;
-            // 
-            // Column9
-            // 
-            this.Column9.HeaderText = "Delay(ms)";
-            this.Column9.Name = "Column9";
-            this.Column9.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column9.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column9.Width = 60;
-            // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "CMD Description";
-            this.Column10.Name = "Column10";
-            this.Column10.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column10.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column10.Width = 120;
-            // 
-            // Column11
-            // 
-            this.Column11.HeaderText = "Reply String";
-            this.Column11.Name = "Column11";
-            this.Column11.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column11.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column11.Width = 150;
-            // 
-            // Column12
-            // 
-            this.Column12.HeaderText = "Result_1";
-            this.Column12.Name = "Column12";
-            this.Column12.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column12.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Column12.Width = 150;
-            // 
-            // Column13
-            // 
-            this.Column13.HeaderText = "Result_2";
-            this.Column13.Name = "Column13";
-            this.Column13.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column13.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // Column14
-            // 
-            this.Column14.HeaderText = "Judge";
-            this.Column14.Name = "Column14";
-            this.Column14.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Column14.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -628,14 +627,14 @@
             this.Controls.Add(this.button_AcOn);
             this.Controls.Add(this.button_Camera);
             this.Controls.Add(this.button_Schedule);
-            this.Controls.Add(this.Txt_LoopCounter);
+            this.Controls.Add(this.Txt_LoopRemain);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.PIC_Arduino);
             this.Controls.Add(this.cboxCameraList);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.PIC_NetworkStatus);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.Label_LoopCounter);
+            this.Controls.Add(this.Label_LoopRemain);
             this.Controls.Add(this.Txt_LoopTimes);
             this.Controls.Add(this.chkBox_LoopTimes);
             this.Controls.Add(this.Picbox_CurrentStatus);
@@ -683,7 +682,7 @@
         private System.Windows.Forms.PictureBox Picbox_CurrentStatus;
         private System.Windows.Forms.CheckBox chkBox_LoopTimes;
         private System.Windows.Forms.TextBox Txt_LoopTimes;
-        private System.Windows.Forms.Label Label_LoopCounter;
+        private System.Windows.Forms.Label Label_LoopRemain;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox PIC_NetworkStatus;
@@ -695,7 +694,7 @@
         private System.Windows.Forms.Button button_Camera;
         private System.Windows.Forms.Button button_AcOn;
         private System.Windows.Forms.Button button_AcOff;
-        private System.Windows.Forms.TextBox Txt_LoopCounter;
+        private System.Windows.Forms.TextBox Txt_LoopRemain;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.PictureBox picBox_preview;
         private AForge.Controls.VideoSourcePlayer videoSourcePlayer1;

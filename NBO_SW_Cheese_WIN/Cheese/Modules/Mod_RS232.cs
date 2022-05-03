@@ -184,7 +184,7 @@ namespace ModuleLayer
             {
                 //sp.Close();
                 //sp.Dispose();
-                //log.Debug($"ReceiveDataEvent error!\n{ex}");
+                log.Debug($"ReceiveDataEvent error!\n{ex}");
             }
         }
 
@@ -261,7 +261,7 @@ namespace ModuleLayer
             }
             catch (Exception e)
             {
-                //log.Debug($"[Mod_RS232]\n{e}");
+                log.Debug($"[Mod_RS232]\n{e}");
             }
 
             return 1;
@@ -305,7 +305,7 @@ namespace ModuleLayer
             }
             catch (Exception e)
             {
-                //log.Debug($"[Mod_RS232]\n{e}");
+                log.Debug($"[Mod_RS232]\n{e}");
             }
 
             return 1;

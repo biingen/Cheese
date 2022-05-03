@@ -32,7 +32,8 @@ namespace Cheese
         string TargetFilePath;
         public int FlagComPortStauts; 
         bool playState, pauseState, flagLoopTimes;
-        int FlagPause, FlagStop, loopTimes = 0, loopCounter = 0, loopRounds = 0;
+        //int FlagPause, FlagStop;
+        int loopTimes = 0, loopRemaining = 0, loopRounds = 1, numInOneLoop;
         int forLoopCount = 0;
         List<Tuple<int, int>> forLoopIndexList = new List<Tuple<int, int>>();
         static string Cmdsend, Cmdreceive;
@@ -56,7 +57,6 @@ namespace Cheese
         // ----------------------------------------------------------------------------------------------- //
         DataTypeConversion dataConv = new DataTypeConversion();
         static Mod_TCPIP_Client NetworkHandle = new Mod_TCPIP_Client();
-        Thread ExecuteCmd_Thread, SerialPort_Receive_Thread, SerialPort_CmdHandling_Thread;
         // ----------------------------------------------------------------------------------------------- //
         public DataGridView tempDataGrid;
         private delegate void dUpdateDataGrid(int x, int y, string data);
@@ -78,12 +78,12 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.011";
+            this.VerLabel.Text = "Version: 00.00.012";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
-            FlagPause = 0;
-            FlagStop = 0;
+            //FlagPause = 0;
+            //FlagStop = 0;
         }
         // ----------------------------------------------------------------------------------------------- //
         public void Form1UpdateArduinoLedStatus(int status)
@@ -312,27 +312,31 @@ namespace Cheese
             if (Cmd == 0)
             {
                 this.Txt_LoopTimes.Enabled = false;
-                this.Txt_LoopCounter.Enabled = false;
+                this.Txt_LoopRemain.Enabled = false;
+                //loopTimes = 1;
+                //LoopReset(loopTimes);
             }
             else if (Cmd == 1)
             {
                 this.Txt_LoopTimes.Enabled = true;
-                this.Txt_LoopCounter.Enabled = true;
+                this.Txt_LoopRemain.Enabled = true;
+                loopTimes = 1;
+                LoopReset(loopTimes);
+                this.Txt_LoopTimes.Text = "1";
+                this.Txt_LoopRemain.Text = this.Txt_LoopTimes.Text;
             }
-            else if (Cmd == 2)  //read loopCounter value from textBox
+            else if (Cmd == 2)  //read loopRemaining value from textBox
             {
-                //result = Convert.ToInt32(this.Txt_LoopTimes.Text);
                 loopTimes = Convert.ToInt32(this.Txt_LoopTimes.Text);
-                loopCounter = loopTimes;
+                LoopReset(loopTimes);
             }
             else if (Cmd == 3)  //write loopCounter value to textBox
             {
-                this.Txt_LoopCounter.Text = valueOfLoop.ToString();
+                this.Txt_LoopRemain.Text = valueOfLoop.ToString();
             }
             else if (Cmd == 4)  //uncheck the chk_loopTimes checkBox
             {
-                //this.Txt_LoopCounter.Visible = false;
-                loopCounter = valueOfLoop;
+                LoopReset(1);
             }
             else if (Cmd == 5)
                 this.chkBox_LoopTimes.Enabled = false;
@@ -487,31 +491,26 @@ namespace Cheese
             RowCount = this.dataGridView1.Rows.Count;
             if (RowCount <= 1) 
             {
-                MessageBox.Show("No Row Data");
+                MessageBox.Show("No more data rows!");
                 //Invoke(UpdateUIBtn, 0, 1);  //this.BTN_StartTest.Enabled = true;
-                //UpdateLoopTxt(1, ref loopCounter);//Enable Loop Text
-                //Invoke(LoopText, 1, loopCounter);
-                //Invoke(LoopText, 3, loopCounter);
-            }
-            else if (GlobalData.m_SerialPort == null)
-            {
-                MessageBox.Show("Check Com-Port Status First");
+                //UpdateLoopTxt(1, ref loopRemaining);//Enable Loop Text
             }
             else
             {
-                //Invoke(LoopText, 0, loopCounter);
-                //UpdateLoopTxt(0, ref loopCounter);  //disable Loop Test
-                //UpdateLoopTxt(2, ref loopCounter);  //get Loop counter
-                //Invoke(LoopText, 2, loopCounter);
-                Invoke(LoopText, 0, 0);
-                Invoke(LoopText, 2, 0);
-                Invoke(LoopText, 5, 0);
-                if (loopCounter < 0)
-                    loopCounter = 0;
+                //Invoke(LoopText, 0, loopRemaining);
+                //UpdateLoopTxt(0, ref loopRemaining);  //disable Loop Test
+                //UpdateLoopTxt(2, ref loopRemaining);  //get Loop counter
+                //Invoke(LoopText, 2, loopRemaining);
+                Invoke(LoopText, 0, -999);
+                Invoke(LoopText, 2, -999);
+                Invoke(LoopText, 5, -999);
+                if (loopRemaining < 0)
+                    loopRemaining = 0;
 
-                while (loopCounter > 0 && playState)    //(loopCounter > 0 && FlagStop == 0)
+                while (loopRemaining > 0 && playState)    //(loopRemaining > 0 && FlagStop == 0)
                 {
-                    GlobalData.caption_Num = 0;
+                    //GlobalData.caption_Num = 0;
+                    numInOneLoop = 1;
                     Invoke(UpdateUIBtn, 3, 1);  //display testing
                     // ============= Clear old data ============= //
                     for (ExeIndex = 0; ExeIndex < (RowCount-1); ExeIndex++)
@@ -539,7 +538,7 @@ namespace Cheese
 
                         if (ExeIndex >= 3)
                         {
-                            Invoke(updateDataGrid, (ExeIndex - 2), -4, "");
+                            Invoke(updateDataGrid, (ExeIndex - 2), -4, "");     //FirstDisplayedScrollingRowIndex
                         }
                         else
                         {
@@ -560,9 +559,7 @@ namespace Cheese
                         if ((columns_command == "_shot") || (columns_command == "PHOTO") || (columns_command == "photo"))
                         {
                             int camSelectMode = 0;
-                            GlobalData.caption_Num++;
-                            //byte[] decodeFromStr = new byte[2];
-                            //decodeFromStr = Encoding.ASCII.GetBytes(columns_subFunction);
+                            //GlobalData.caption_Num++;
 
                             if (columns_subFunction == "all" || columns_subFunction == "")
                                 camSelectMode = -1;
@@ -579,7 +576,6 @@ namespace Cheese
                                 Invoke(WriteDataGrid, 11, ExeIndex, "Fail");
                                 Invoke(WriteDataGrid, 12, ExeIndex, "Fail");
                             }
-
                         }
                         #endregion
                         #region -- Schedule for Robot Command --
@@ -623,7 +619,7 @@ namespace Cheese
                             // ----------------------- Process data string from csv file ----------------------- //
                             if (columns_command == "_HEX")
                             {
-                                //caluate CRC field
+                                //calculate CRC field
                                 if (columns_function == "XOR8")
                                 {
                                     cmdString = columns_cmdLine;
@@ -1834,10 +1830,10 @@ namespace Cheese
                     }
                     wFile.Close();*/
 
-                    loopCounter--;
-                    loopRounds = loopTimes - loopCounter + 1;
                     log.Info($"Round-{loopRounds} is done.");
-					Invoke(LoopText, 3, loopCounter);
+                    loopRemaining--;
+                    loopRounds++;
+					Invoke(LoopText, 3, loopRemaining);
                 }
                 //----------------------------------------------------//
                 MessageBox.Show("All schedules finished");
@@ -1848,7 +1844,9 @@ namespace Cheese
                 Invoke(UpdateUIBtn, 5, 0);  //button_Snapshot.Enabled = false;
                 Invoke(UpdateUIBtn, 6, 0);  //button_Schedule.Enabled = false;
                 Invoke(UpdateUIBtn, 9, 1);  //cboxCameraList.Enabled = true;
-                Invoke(LoopText, 6, 0);
+                Invoke(LoopText, 6, -999);
+                Invoke(LoopText, 3, loopTimes);
+                //Invoke(LoopText, 4, -999);
                 if (flagLoopTimes)
                     Invoke(LoopText, 1, 0);
             }
@@ -2224,16 +2222,17 @@ namespace Cheese
                 TargetFilePath = dialog.FileName;
                 string safeFileName = dialog.SafeFileName;
                 Console.WriteLine(TargetFilePath);
-                //Task task = new Task();
-                //task.Start();
                 UpdateDataGrid();
-
+                dataGridView1.Visible = true;
                 ini12.INIWrite(GlobalData.MainSettingPath, "Schedule1", "Exist", "1");
                 ini12.INIWrite(GlobalData.MainSettingPath, "Schedule1", "Path", TargetFilePath);
-
-                Invoke(UpdateUIBtn, 4, 0);  //button_Camera.Enabled = false;
-                Invoke(UpdateUIBtn, 5, 0);  //button_Snapshot.Enabled = false;
-                Invoke(UpdateUIBtn, 6, 1);  //button_Schedule.Enabled = true;
+                
+                if (button_Schedule.Enabled == true)
+                {
+                    Invoke(UpdateUIBtn, 4, 1);  //button_Camera.Enabled = true;
+                    Invoke(UpdateUIBtn, 6, 0);  //button_Schedule.Enabled = false;
+                    Invoke(UpdateUIBtn, 5, 1);  //button_Snapshot.Enabled = true;
+                }
             }
         }
 
@@ -2243,9 +2242,6 @@ namespace Cheese
             dUpdateUI ArduinoLED = new dUpdateUI(Form1UpdateArduinoLedStatus);
             dUpdateUI UILED = new dUpdateUI(Form1UpdateComportLedStatus);
             dUpdateUI UINetworkLED = new dUpdateUI(Form1UpdateNetworkLedStatus);
-            int ComportStatus;
-            string PortNumber;
-            int BaudRate, ParityBit, StopBit, DataLen;
             int NetworkStatus;
             string IP;
             int NetworkPort;
@@ -2300,7 +2296,7 @@ namespace Cheese
                     else
                     {
                         UILED.Invoke(0);
-                        MessageBox.Show("Fail to open ComPort!");
+                        //MessageBox.Show("Fail to open ComPort!");
                     }
                 }
 
@@ -2433,9 +2429,9 @@ namespace Cheese
                     }
                     Thread.Sleep(1000);
                 }*/
-            }
+        }
 
-            public void Snapshot(int cameraSelectMode, string delayTimeString, string remark)
+        public void Snapshot(int cameraSelectMode, string delayTimeString, string remark)
         {
             //log.Debug("Snapshot: " + cameraSelectMode + ", " + delayTimeString + ", " + remark);
             string image_currentPath = System.Environment.CurrentDirectory;
@@ -2457,12 +2453,11 @@ namespace Cheese
             {
                 try
                 {
-                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "_" + Convert.ToString(Int32.Parse(Txt_LoopTimes.Text) - Int32.Parse(Txt_LoopCounter.Text) + 1) + "_" + GlobalData.caption_Num + ".jpeg";
+                    string fileName = DateTime.Now.ToString("yyyyMMdd-HHmmssff") + "_" + loopRounds.ToString() + "_" + numInOneLoop + ".jpeg";
 
                     if (cameraSelectMode < 0 && i == 0)
                     {
                         deviceName = (i + 1).ToString() + "_" + videoDevices[i].Name.ToString();
-                        //iVideoSource1 = videoSourcePlayer1.VideoSource;
                         Bitmap bmp = videoSourcePlayer1.GetCurrentVideoFrame();
                         string saveName = image_currentPath + "\\" + deviceName + "\\" + deviceName + "_" + fileName;
                         DrawOnBitmap(ref bmp, remark, delayTimeString, deviceName, saveName);
@@ -2470,7 +2465,6 @@ namespace Cheese
                     else if (cameraSelectMode < 0 && i == 1)
                     {
                         deviceName = (i + 1).ToString() + "_" + videoDevices[i].Name.ToString();
-                        //iVideoSource2 = videoSourcePlayer2.VideoSource;
                         Bitmap bmp = videoSourcePlayer2.GetCurrentVideoFrame();
                         string saveName = image_currentPath + "\\" + deviceName + "\\" + deviceName + "_" + fileName;
                         DrawOnBitmap(ref bmp, remark, delayTimeString, deviceName, saveName);
@@ -2493,7 +2487,7 @@ namespace Cheese
                         string saveName = image_currentPath + "\\" + deviceName + "\\" + deviceName + "_" + fileName;
                         DrawOnBitmap(ref bmp, remark, delayTimeString, deviceName, saveName);
                     }
-
+                    numInOneLoop++;     //this record is used to identify snapshot number of file name in certain loop
                 }
                 catch (Exception ex)
                 {
@@ -2742,23 +2736,18 @@ namespace Cheese
             ProcessLoopText LoopText = new ProcessLoopText(UpdateLoopTxt);
             if (this.chkBox_LoopTimes.Checked == true)
             {
-                //this.Txt_LoopTimes.Enabled = true;
-                //this.Txt_LoopCounter.Enabled = true;
-                Invoke(LoopText, 1, 0);
-                //loopTimes = Convert.ToInt32(Txt_LoopTimes.Text);
-                //loopCounter = Convert.ToInt32(Txt_LoopCounter.Text);
-                Invoke(LoopText, 2, 0);
-                Invoke(LoopText, 3, loopCounter);
+                //Txt_LoopTimes.Enabled = Txt_loopRemain.Enabled = true;
+                //loopTimes = loopRemaining = loopRounds = 1
+                Invoke(LoopText, 1, -999);
                 flagLoopTimes = true;
             }
             else
             {
                 //this.Txt_LoopTimes.Enabled = false;
-                //this.Txt_LoopCounter.Enabled = false;
-                Invoke(LoopText, 0, 0);
-                //Invoke(LoopText, 4, 1);
-                //loopTimes = 1;
-                //loopCounter = 1;
+                //this.Txt_loopRemain.Enabled = false;
+                //loopTimes = loopRemaining = loopRounds = 1
+                Invoke(LoopText, 0, -999);
+                Invoke(LoopText, 4, -999);
                 flagLoopTimes = false;
             }
         }
@@ -2768,11 +2757,18 @@ namespace Cheese
             TextBox txtBox = (TextBox)sender;
             if (this.chkBox_LoopTimes.Checked == true)
             {
-                Txt_LoopCounter.Text = txtBox.Text;
+                Txt_LoopRemain.Text = txtBox.Text;
                 //loopCounter = Convert.ToInt32(Txt_LoopCounter.Text);
             }
             //else
-            //{ No need since Txt_LoopCounter is disabled. }
+            //{ No need since Txt_loopRemain is disabled. }
+        }
+
+        private void LoopReset(int valueOfLoop)
+        {
+            //loopTimes = valueOfLoop;
+            loopRemaining = valueOfLoop;
+            loopRounds = 1;
         }
 
         private void button_Camera_Click(object sender, EventArgs e)
