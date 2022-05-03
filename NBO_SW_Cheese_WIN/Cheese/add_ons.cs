@@ -98,9 +98,9 @@ namespace Cheese
                     #endregion
 
                     #region 偵測Arduino
-                    if ((deviceId.IndexOf("FTDIBUS\\VID_0403+PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) ||
-                        (deviceId.IndexOf("FTDIBUS\\COMPORT&VID_0403&PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) ||    //for WIN10   
-                        (deviceId.IndexOf("USB\\VID_1A86&PID_7523", StringComparison.OrdinalIgnoreCase) >= 0))      //for another Arduino chip
+                    if ((deviceId.IndexOf("FTDIBUS\\VID_0403+PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) || 
+                        (deviceId.IndexOf("FTDIBUS\\COMPORT&VID_0403&PID_6001", StringComparison.OrdinalIgnoreCase) >= 0) || 
+                        (deviceId.IndexOf("USB\\VID_1A86&PID_7523", StringComparison.OrdinalIgnoreCase) >= 0))	//for another Arduino chip
                     {
                         Console.WriteLine("-----------------Arduino------------------");
                         Console.WriteLine("DeviceID: {0}\n" +
@@ -141,7 +141,8 @@ namespace Cheese
                     #endregion
 
                     #region 偵測USB_FTDI_2232H
-                    if (deviceId.IndexOf("USB\\VID_0403&PID_6010\\", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (deviceId.IndexOf("USB\\VID_0403&PID_6010\\", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                         deviceId.IndexOf("FTDIBUS\\COMPORT&VID_0403&PID_6010", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         Console.WriteLine("-----------------USB_FTDI_2232H------------------");
                         Console.WriteLine("DeviceID: {0}\n" +
@@ -192,7 +193,7 @@ namespace Cheese
             string[] Device = { "Software", "ArduinoExist", "ArduinoPort", "CameraExist", "RedRatExist", "DOS", "RunAfterStartUp", "CAx10Exist" };
             string[] RedRat = { "RedRatIndex", "DBFile", "Brands", "SerialNumber" };
             string[] Camera = { "VideoIndex", "VideoNumber", "VideoName", "AudioIndex", "AudioNumber", "AudioName", "CameraDevice", "Resolution" };
-            string[] SerialPort = { "Selected", "PortName", "BaudRate", "DataBit", "StopBits", "DisplayHex" };
+            string[] SerialPortItems = { "Selected", "PortName", "BaudRate", "DataBits", "Parity", "StopBits", "Handshake" };
             string[] Schedule1 = { "Exist", "Loop", "OnTimeStart", "Timer", "Path" };
             string[] LogSearch = { "StartTime", "Comport1", "Comport2", "Comport3", "Comport4", "Comport5", "TextNum", "Camerarecord", "Camerashot",
                                                 "Sendmail", "Savelog", "Showmessage", "ACcontrol", "Stop", "AC OFF", "Nowvalue",
@@ -238,15 +239,15 @@ namespace Cheese
                     }
                 }
 
-                for (int i = 0; i < SerialPort.Length; i++)
+                for (int i = 0; i < SerialPortItems.Length; i++)
                 {
-                    if (i == (SerialPort.Length - 1))
+                    if (i == (SerialPortItems.Length - 1))
                     {
-                        ini12.INIWrite(MainSettingPath, "Serial Port", SerialPort[i], "" + Environment.NewLine + Environment.NewLine);
+                        ini12.INIWrite(MainSettingPath, "SerialPort", SerialPortItems[i], "" + Environment.NewLine + Environment.NewLine);
                     }
                     else
                     {
-                        ini12.INIWrite(MainSettingPath, "Serial Port", SerialPort[i], "");
+                        ini12.INIWrite(MainSettingPath, "SerialPort", SerialPortItems[i], "");
                     }
                 }
 

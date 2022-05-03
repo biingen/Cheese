@@ -32,7 +32,7 @@ namespace Cheese
         string TargetFilePath;
         public int FlagComPortStauts; 
         bool playState, pauseState, flagLoopTimes;
-        int FlagPause, FlagStop, loopTimes = 0, loopCounter = 0;
+        int FlagPause, FlagStop, loopTimes = 0, loopCounter = 0, loopRounds = 0;
         int forLoopCount = 0;
         List<Tuple<int, int>> forLoopIndexList = new List<Tuple<int, int>>();
         static string Cmdsend, Cmdreceive;
@@ -78,7 +78,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.010";
+            this.VerLabel.Text = "Version: 00.00.011";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -605,7 +605,7 @@ namespace Cheese
                         {
                             GlobalData.m_SerialPort.WriteDataOut(columns_cmdLine, columns_cmdLine.Length);
                             Thread.Sleep(50);
-                            Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedText);
+                            Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedRaw);
                             //GetSerialData(GlobalData.m_SerialPort_A);
                             /*
                             int numOfBytes = GlobalData.m_SerialPort_A.GetRxBytes();
@@ -638,8 +638,8 @@ namespace Cheese
                                     GlobalData.m_SerialPort.WriteDataOut(cmdBytes, cmdBytes.Length);
                                     Task.Delay(2000).Wait();     //delay long enough by a Task to receive serialport data
                                     //Thread.Sleep(2000) is not a suggested way;
-                                    Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.Measure_Backlight);
-                                    Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.Measure_Thermal);
+                                    Invoke(WriteDataGrid, 10, ExeIndex, GlobalData.RS232_receivedAscii);
+                                    Invoke(WriteDataGrid, 11, ExeIndex, GlobalData.RS232_receivedRaw);
                                 }
                             }
 
@@ -840,8 +840,9 @@ namespace Cheese
                         #region -- GPIO_INPUT_OUTPUT --
                         else if (columns_command == "_Arduino_Input")
                         {
+                            Arduino_Get_GPIO_Input(ref GPIO_Read_Data, 10);
                             delayTime = Convert.ToInt32(columns_wait);
-                            Arduino_Get_GPIO_Input(ref GPIO_Read_Data, delayTime);
+                            Thread.Sleep(delayTime);
                         }
                         else if (columns_command == "_Arduino_Output")
                         {
@@ -858,19 +859,18 @@ namespace Cheese
                                 GlobalData.Arduino_relay_status = true;
                                 GPIO_B = 0x02;
                             }
-                            Arduino_Set_GPIO_Output(GPIO_B, 100);
+                            Arduino_Set_GPIO_Output(GPIO_B, 10);
 
                             delayTime = Convert.ToInt32(columns_wait);
                             Thread.Sleep(delayTime);
-
-                            Arduino_Get_GPIO_Input(ref GPIO_Read_Data, delayTime);
                         }
                         else if (columns_command == "_Arduino_Command")
                         {
                             if (columns_cmdLine != "")
                             {
+                                Arduino_Set_Value(columns_cmdLine, 10);
                                 delayTime = Convert.ToInt32(columns_wait);
-                                Arduino_Set_Value(columns_cmdLine, delayTime);
+                                Thread.Sleep(delayTime);
                             }
                             else
                                 MessageBox.Show("Please check the Arduino command.", "Arduino command Error!");
@@ -1669,7 +1669,8 @@ namespace Cheese
                                     
                                     log.Info($"[{columns_remark}]_{columns_cmdLine}_");
                                     columns_cmdLine = "";
-                                    Thread.Sleep(500);
+                                    //Thread.Sleep(500);
+                                    Task.Delay(500).Wait();
                                     if (GlobalData.Ftdi_lib.I2C_SEQ_Read(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData, readBytes, out recLength) == FtResult.Ok)
                                     {
                                         // Below part is used to print data content with raw data and ascii data formats
@@ -1834,7 +1835,8 @@ namespace Cheese
                     wFile.Close();*/
 
                     loopCounter--;
-                    log.Info($"Round-{loopTimes - loopCounter} is done.");
+                    loopRounds = loopTimes - loopCounter + 1;
+                    log.Info($"Round-{loopRounds} is done.");
 					Invoke(LoopText, 3, loopCounter);
                 }
                 //----------------------------------------------------//
@@ -1891,8 +1893,7 @@ namespace Cheese
                             else if (i >= 5)
                                 valStr += tmpBt[i].ToString();
                         }*/
-                        
-                        Thread.Sleep(delay_time);
+                        Task.Delay(delay_time).Wait();
                         
                         serial_receive = GlobalData.Arduino_recFlag;
                         if (!serial_receive && retry_cnt == 0)
@@ -1973,7 +1974,7 @@ namespace Cheese
                     do
                     {
                         GlobalData.sp_Arduino.WriteDataOut(dataValue, dataValue.Length);
-                        Thread.Sleep(delay_time);
+                        Task.Delay(delay_time).Wait();
                         if (serial_receive == false && retry_cnt == 0)
                         {
                             MessageBox.Show("Arduino response output timeout and please replug the Arduino board.", "Connection Error");
@@ -2396,9 +2397,9 @@ namespace Cheese
                             //benQ.QueueAddedToList_ODM_BenQ(ref cmdByteList, ref packetQueueList);
                             //===benQ.QueueAddedToList_ODM_BenQ(GlobalData.m_SerialPort);
                         }
-
-                        GlobalData.Measure_Backlight = Encoding.ASCII.GetString(queueBuffer);
-                        GlobalData.Measure_Thermal = byteToString;
+						
+                        GlobalData.RS232_receivedRaw = Encoding.ASCII.GetString(queueBuffer);
+                        GlobalData.RS232_receivedAscii = byteToString;
                     }
                     Task.Delay(1000).Wait();
                 }
@@ -2917,14 +2918,17 @@ namespace Cheese
             Graphics gph = Graphics.FromImage(bmp);
             // 1. Draw time
             DateTime dt = DateTime.Now;
-            gph.DrawString(string.Format("{0:R}", dt), new Font("Arial", 16), Brushes.Yellow, 0, 0);
+            gph.DrawString(string.Format("{0:R}", dt), new Font("Arial", 20), Brushes.Yellow, 0, 0);
             // 2. Draw AC on/off status
+            /*
             if (GlobalData.Arduino_relay_status)
                 gph.DrawString("AC Source: On", new Font("Arial", 16), Brushes.Yellow, 0, 20);
             else
                 gph.DrawString("AC Source: Off", new Font("Arial", 16), Brushes.Yellow, 0, 20);
+            */
             // 3. Draw schedule remark
-            gph.DrawString(string.Format("{0}", remarkStr), new Font("Arial", 16), Brushes.Yellow, 0, 40);
+            gph.DrawString(string.Format("{0}", remarkStr), new Font("Arial", 20), Brushes.Yellow, 0, 40);
+            gph.DrawString(string.Format("Round: {0}", loopRounds), new Font("Arial", 20), Brushes.Yellow, 0, 80);
             gph.Flush();
 
             //Delay Time
@@ -2969,15 +2973,13 @@ namespace Cheese
             if (videoDevices.Count > 0 && videoSource1 == null && videoSource2 == null)
             {
                 videoSource1 = new VideoCaptureDevice(videoDevices[0].MonikerString);
-                //videoSource1.DesiredFrameRate = 10;
                 int resolution_Index_1 = videoSource1.VideoCapabilities.Count();
                 // C310 [13/19]: 960x544; // C310 [15/19]: 1024x576; //C615 [11/15]: 960x720
-                //do not set too high resolution in case of crash issue
                 if (resolution_Index_1 >= res_Index)
                 {
                     videoSource1.VideoResolution = videoSource1.VideoCapabilities[resolution_Index_1 - res_Index];
                     string resString = videoSource1.VideoResolution.FrameSize.Width.ToString() + " x " +
-                                        videoSource1.VideoResolution.FrameSize.Height.ToString();
+                                                    videoSource1.VideoResolution.FrameSize.Height.ToString();
 
                     Invoke(updateString, 1, resString);
                 }
@@ -3061,26 +3063,6 @@ namespace Cheese
 
             return status;
         }
-
-        // ====== used along with SerialRxThread ====== //
-        /*
-        private void GetSerialData(Mod_RS232 SpHandler)
-        {
-            while (SpHandler.IsOpen())
-            {
-                int data_to_read = SpHandler.GetRxBytes();
-                if (data_to_read > 0)
-                {
-                    byte[] dataset = new byte[data_to_read];
-                    SpHandler.ReadDataIn(dataset, data_to_read);
-                }
-            }
-        }
-
-        public void SerialRxThread()
-        {
-            GetSerialData(GlobalData.m_SerialPort);
-        }*/
 		
 		private static void SetMonitorFeatures(SafePhysicalMonitorHandle spmHandle, List<Tuple<byte, uint>> dicList)
         {

@@ -105,7 +105,8 @@ namespace Cheese
         public static int caption_Num = 0;
         public static bool RS232_A_Flag = false;
         public static string RS232_chksumByte = "";
-        public static string RS232_receivedText = "";
+        public static string RS232_receivedRaw = "";
+        public static string RS232_receivedAscii = "";
         public static string RS232_sentText = "";
         public static string Measure_Backlight = "";
         public static string Measure_Thermal = "";

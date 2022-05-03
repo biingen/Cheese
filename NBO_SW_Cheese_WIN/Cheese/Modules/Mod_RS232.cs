@@ -240,8 +240,9 @@ namespace ModuleLayer
                     _SerialPortHandle.ReadBufferSize = 1024;
                     ReceiveQueue.Clear();
                     _SerialPortHandle.Open();
-
-                    //log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
+					
+                    log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
+                    Thread.Sleep(20);
                     //_SerialPortHandle.DataReceived += new SerialDataReceivedEventHandler(ReceiveData);
                 }
                 else
@@ -329,6 +330,7 @@ namespace ModuleLayer
                     _SerialPortHandle.ReadBufferSize = 1024;
                     ReceiveQueue.Clear();
                     _SerialPortHandle.Open();
+					
                     log.Debug($"[Mod_RS232] {_SerialPortHandle.PortName} is successfully opened.");
                     Thread.Sleep(20);
                     /*
@@ -362,6 +364,8 @@ namespace ModuleLayer
         public int ClosePort()
         {
             ReceiveQueue.Clear();
+            GlobalData.RS232_receivedRaw = "";
+            GlobalData.RS232_receivedAscii = "";
             _SerialPortHandle.Dispose();    //added by YFC
             _SerialPortHandle.Close();
 			
