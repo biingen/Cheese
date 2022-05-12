@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
@@ -101,7 +102,7 @@
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1194, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(1592, 27);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -110,7 +111,7 @@
             this.toolStripButton1.Image = global::Cheese.ImageResource.open_file;
             this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(85, 24);
+            this.toolStripButton1.Size = new System.Drawing.Size(99, 24);
             this.toolStripButton1.Text = "Open File";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
@@ -119,7 +120,7 @@
             this.toolStripButton2.Image = global::Cheese.ImageResource.tools;
             this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton2.Name = "toolStripButton2";
-            this.toolStripButton2.Size = new System.Drawing.Size(71, 24);
+            this.toolStripButton2.Size = new System.Drawing.Size(83, 24);
             this.toolStripButton2.Text = "Setting";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
@@ -128,16 +129,16 @@
             this.toolStripButton3.Image = global::Cheese.ImageResource.save_file;
             this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton3.Name = "toolStripButton3";
-            this.toolStripButton3.Size = new System.Drawing.Size(80, 24);
+            this.toolStripButton3.Size = new System.Drawing.Size(94, 24);
             this.toolStripButton3.Text = "Save File";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
             // toolStripButton4
             // 
-            this.toolStripButton4.Image = global::Cheese.ImageResource.tools;
+            this.toolStripButton4.Image = global::Cheese.ImageResource.tv_remote;
             this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton4.Name = "toolStripButton4";
-            this.toolStripButton4.Size = new System.Drawing.Size(95, 24);
+            this.toolStripButton4.Size = new System.Drawing.Size(111, 24);
             this.toolStripButton4.Text = "Open GPIO";
             this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
             // 
@@ -161,9 +162,10 @@
             this.Column14});
             this.dataGridView1.EnableHeadersVisualStyles = false;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(1172, 480);
+            this.dataGridView1.Size = new System.Drawing.Size(1563, 600);
             this.dataGridView1.TabIndex = 1;
             // 
             // Column1
@@ -280,9 +282,10 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(173, 42);
+            this.label1.Location = new System.Drawing.Point(231, 52);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(116, 19);
+            this.label1.Size = new System.Drawing.Size(141, 24);
             this.label1.TabIndex = 6;
             this.label1.Text = "ComPort Status";
             // 
@@ -291,9 +294,10 @@
             this.VerLabel.AutoSize = true;
             this.VerLabel.Font = new System.Drawing.Font("Calibri", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.VerLabel.ForeColor = System.Drawing.Color.Coral;
-            this.VerLabel.Location = new System.Drawing.Point(886, 640);
+            this.VerLabel.Location = new System.Drawing.Point(1181, 800);
+            this.VerLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.VerLabel.Name = "VerLabel";
-            this.VerLabel.Size = new System.Drawing.Size(96, 29);
+            this.VerLabel.Size = new System.Drawing.Size(118, 37);
             this.VerLabel.TabIndex = 7;
             this.VerLabel.Text = "Version:";
             // 
@@ -301,9 +305,10 @@
             // 
             this.chkBox_LoopTimes.AutoSize = true;
             this.chkBox_LoopTimes.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkBox_LoopTimes.Location = new System.Drawing.Point(400, 574);
+            this.chkBox_LoopTimes.Location = new System.Drawing.Point(533, 718);
+            this.chkBox_LoopTimes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.chkBox_LoopTimes.Name = "chkBox_LoopTimes";
-            this.chkBox_LoopTimes.Size = new System.Drawing.Size(118, 27);
+            this.chkBox_LoopTimes.Size = new System.Drawing.Size(149, 33);
             this.chkBox_LoopTimes.TabIndex = 9;
             this.chkBox_LoopTimes.Text = "Loop Times";
             this.chkBox_LoopTimes.UseVisualStyleBackColor = true;
@@ -313,9 +318,10 @@
             // 
             this.Txt_LoopTimes.Enabled = false;
             this.Txt_LoopTimes.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Txt_LoopTimes.Location = new System.Drawing.Point(558, 574);
+            this.Txt_LoopTimes.Location = new System.Drawing.Point(744, 718);
+            this.Txt_LoopTimes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Txt_LoopTimes.Name = "Txt_LoopTimes";
-            this.Txt_LoopTimes.Size = new System.Drawing.Size(79, 26);
+            this.Txt_LoopTimes.Size = new System.Drawing.Size(104, 30);
             this.Txt_LoopTimes.TabIndex = 10;
             this.Txt_LoopTimes.Text = "1";
             this.Txt_LoopTimes.TextChanged += new System.EventHandler(this.Txt_LoopTimes_TextChanged);
@@ -324,9 +330,10 @@
             // 
             this.Label_LoopRemain.AutoSize = true;
             this.Label_LoopRemain.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label_LoopRemain.Location = new System.Drawing.Point(416, 615);
+            this.Label_LoopRemain.Location = new System.Drawing.Point(555, 769);
+            this.Label_LoopRemain.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.Label_LoopRemain.Name = "Label_LoopRemain";
-            this.Label_LoopRemain.Size = new System.Drawing.Size(136, 23);
+            this.Label_LoopRemain.Size = new System.Drawing.Size(174, 29);
             this.Label_LoopRemain.TabIndex = 11;
             this.Label_LoopRemain.Text = "Loop Remaining";
             // 
@@ -334,9 +341,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(323, 42);
+            this.label2.Location = new System.Drawing.Point(431, 52);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(116, 19);
+            this.label2.Size = new System.Drawing.Size(140, 24);
             this.label2.TabIndex = 12;
             this.label2.Text = "Network Status";
             // 
@@ -347,9 +355,10 @@
             this.cboxCameraList.Items.AddRange(new object[] {
             "1",
             "2"});
-            this.cboxCameraList.Location = new System.Drawing.Point(947, 37);
+            this.cboxCameraList.Location = new System.Drawing.Point(1263, 46);
+            this.cboxCameraList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cboxCameraList.Name = "cboxCameraList";
-            this.cboxCameraList.Size = new System.Drawing.Size(228, 27);
+            this.cboxCameraList.Size = new System.Drawing.Size(303, 30);
             this.cboxCameraList.TabIndex = 28;
             this.cboxCameraList.SelectedIndexChanged += new System.EventHandler(this.cboxCameraList_SelectedIndexChanged);
             // 
@@ -359,9 +368,10 @@
             this.label7.BackColor = System.Drawing.Color.Black;
             this.label7.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label7.ForeColor = System.Drawing.Color.White;
-            this.label7.Location = new System.Drawing.Point(786, 39);
+            this.label7.Location = new System.Drawing.Point(1048, 49);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(155, 22);
+            this.label7.Size = new System.Drawing.Size(198, 28);
             this.label7.TabIndex = 27;
             this.label7.Text = "Camera Device:";
             // 
@@ -369,9 +379,10 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(31, 43);
+            this.label3.Location = new System.Drawing.Point(41, 54);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(112, 19);
+            this.label3.Size = new System.Drawing.Size(135, 24);
             this.label3.TabIndex = 30;
             this.label3.Text = "Arduino Status";
             // 
@@ -379,9 +390,10 @@
             // 
             this.button_Schedule.Enabled = false;
             this.button_Schedule.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_Schedule.Location = new System.Drawing.Point(12, 623);
+            this.button_Schedule.Location = new System.Drawing.Point(16, 779);
+            this.button_Schedule.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Schedule.Name = "button_Schedule";
-            this.button_Schedule.Size = new System.Drawing.Size(109, 43);
+            this.button_Schedule.Size = new System.Drawing.Size(145, 54);
             this.button_Schedule.TabIndex = 33;
             this.button_Schedule.Text = "Schedule";
             this.button_Schedule.UseVisualStyleBackColor = true;
@@ -390,9 +402,10 @@
             // button_Camera
             // 
             this.button_Camera.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_Camera.Location = new System.Drawing.Point(12, 574);
+            this.button_Camera.Location = new System.Drawing.Point(16, 718);
+            this.button_Camera.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Camera.Name = "button_Camera";
-            this.button_Camera.Size = new System.Drawing.Size(109, 43);
+            this.button_Camera.Size = new System.Drawing.Size(145, 54);
             this.button_Camera.TabIndex = 34;
             this.button_Camera.Text = "Camera";
             this.button_Camera.UseVisualStyleBackColor = true;
@@ -401,9 +414,10 @@
             // button_AcOn
             // 
             this.button_AcOn.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_AcOn.Location = new System.Drawing.Point(242, 574);
+            this.button_AcOn.Location = new System.Drawing.Point(323, 718);
+            this.button_AcOn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_AcOn.Name = "button_AcOn";
-            this.button_AcOn.Size = new System.Drawing.Size(109, 43);
+            this.button_AcOn.Size = new System.Drawing.Size(145, 54);
             this.button_AcOn.TabIndex = 35;
             this.button_AcOn.Text = "AC On";
             this.button_AcOn.UseVisualStyleBackColor = true;
@@ -413,9 +427,10 @@
             // 
             this.button_AcOff.Enabled = false;
             this.button_AcOff.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_AcOff.Location = new System.Drawing.Point(242, 623);
+            this.button_AcOff.Location = new System.Drawing.Point(323, 779);
+            this.button_AcOff.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_AcOff.Name = "button_AcOff";
-            this.button_AcOff.Size = new System.Drawing.Size(109, 43);
+            this.button_AcOff.Size = new System.Drawing.Size(145, 54);
             this.button_AcOff.TabIndex = 36;
             this.button_AcOff.Text = "AC off";
             this.button_AcOff.UseVisualStyleBackColor = true;
@@ -425,9 +440,10 @@
             // 
             this.Txt_LoopRemain.Enabled = false;
             this.Txt_LoopRemain.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Txt_LoopRemain.Location = new System.Drawing.Point(558, 615);
+            this.Txt_LoopRemain.Location = new System.Drawing.Point(744, 769);
+            this.Txt_LoopRemain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Txt_LoopRemain.Name = "Txt_LoopRemain";
-            this.Txt_LoopRemain.Size = new System.Drawing.Size(79, 26);
+            this.Txt_LoopRemain.Size = new System.Drawing.Size(104, 30);
             this.Txt_LoopRemain.TabIndex = 32;
             this.Txt_LoopRemain.Text = "1";
             // 
@@ -441,17 +457,19 @@
             this.panel1.Controls.Add(this.videoSourcePlayer2);
             this.panel1.Controls.Add(this.picBox_preview);
             this.panel1.Controls.Add(this.videoSourcePlayer1);
-            this.panel1.Location = new System.Drawing.Point(12, 68);
+            this.panel1.Location = new System.Drawing.Point(16, 85);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1180, 480);
+            this.panel1.Size = new System.Drawing.Size(1573, 600);
             this.panel1.TabIndex = 37;
             // 
             // textBox_cam2Res
             // 
             this.textBox_cam2Res.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox_cam2Res.Location = new System.Drawing.Point(1035, 105);
+            this.textBox_cam2Res.Location = new System.Drawing.Point(1380, 131);
+            this.textBox_cam2Res.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox_cam2Res.Name = "textBox_cam2Res";
-            this.textBox_cam2Res.Size = new System.Drawing.Size(128, 29);
+            this.textBox_cam2Res.Size = new System.Drawing.Size(169, 35);
             this.textBox_cam2Res.TabIndex = 41;
             this.textBox_cam2Res.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.textBox_cam2Res.WordWrap = false;
@@ -459,9 +477,10 @@
             // textBox_cam1Res
             // 
             this.textBox_cam1Res.Font = new System.Drawing.Font("Arial", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox_cam1Res.Location = new System.Drawing.Point(3, 346);
+            this.textBox_cam1Res.Location = new System.Drawing.Point(4, 432);
+            this.textBox_cam1Res.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox_cam1Res.Name = "textBox_cam1Res";
-            this.textBox_cam1Res.Size = new System.Drawing.Size(128, 29);
+            this.textBox_cam1Res.Size = new System.Drawing.Size(169, 35);
             this.textBox_cam1Res.TabIndex = 40;
             this.textBox_cam1Res.WordWrap = false;
             // 
@@ -471,9 +490,10 @@
             this.label_cam2.BackColor = System.Drawing.Color.Black;
             this.label_cam2.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_cam2.ForeColor = System.Drawing.Color.White;
-            this.label_cam2.Location = new System.Drawing.Point(1065, 137);
+            this.label_cam2.Location = new System.Drawing.Point(1420, 171);
+            this.label_cam2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_cam2.Name = "label_cam2";
-            this.label_cam2.Size = new System.Drawing.Size(98, 22);
+            this.label_cam2.Size = new System.Drawing.Size(124, 28);
             this.label_cam2.TabIndex = 4;
             this.label_cam2.Text = "Camera 2";
             // 
@@ -483,35 +503,39 @@
             this.label_cam1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.label_cam1.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_cam1.ForeColor = System.Drawing.Color.White;
-            this.label_cam1.Location = new System.Drawing.Point(3, 321);
+            this.label_cam1.Location = new System.Drawing.Point(4, 401);
+            this.label_cam1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label_cam1.Name = "label_cam1";
-            this.label_cam1.Size = new System.Drawing.Size(98, 22);
+            this.label_cam1.Size = new System.Drawing.Size(124, 28);
             this.label_cam1.TabIndex = 3;
             this.label_cam1.Text = "Camera 1";
             // 
             // videoSourcePlayer2
             // 
-            this.videoSourcePlayer2.Location = new System.Drawing.Point(603, 162);
+            this.videoSourcePlayer2.Location = new System.Drawing.Point(804, 202);
+            this.videoSourcePlayer2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoSourcePlayer2.Name = "videoSourcePlayer2";
-            this.videoSourcePlayer2.Size = new System.Drawing.Size(560, 315);
+            this.videoSourcePlayer2.Size = new System.Drawing.Size(747, 394);
             this.videoSourcePlayer2.TabIndex = 2;
             this.videoSourcePlayer2.Text = "videoSourcePlayer2";
             this.videoSourcePlayer2.VideoSource = null;
             // 
             // picBox_preview
             // 
-            this.picBox_preview.Location = new System.Drawing.Point(603, 3);
+            this.picBox_preview.Location = new System.Drawing.Point(804, 4);
+            this.picBox_preview.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.picBox_preview.Name = "picBox_preview";
-            this.picBox_preview.Size = new System.Drawing.Size(272, 153);
+            this.picBox_preview.Size = new System.Drawing.Size(363, 191);
             this.picBox_preview.TabIndex = 1;
             this.picBox_preview.TabStop = false;
             // 
             // videoSourcePlayer1
             // 
             this.videoSourcePlayer1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.videoSourcePlayer1.Location = new System.Drawing.Point(3, 3);
+            this.videoSourcePlayer1.Location = new System.Drawing.Point(4, 4);
+            this.videoSourcePlayer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.videoSourcePlayer1.Name = "videoSourcePlayer1";
-            this.videoSourcePlayer1.Size = new System.Drawing.Size(560, 315);
+            this.videoSourcePlayer1.Size = new System.Drawing.Size(747, 394);
             this.videoSourcePlayer1.TabIndex = 0;
             this.videoSourcePlayer1.Text = "videoSourcePlayer1";
             this.videoSourcePlayer1.VideoSource = null;
@@ -520,9 +544,10 @@
             // 
             this.button_Snapshot.Enabled = false;
             this.button_Snapshot.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_Snapshot.Location = new System.Drawing.Point(127, 574);
+            this.button_Snapshot.Location = new System.Drawing.Point(169, 718);
+            this.button_Snapshot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Snapshot.Name = "button_Snapshot";
-            this.button_Snapshot.Size = new System.Drawing.Size(109, 43);
+            this.button_Snapshot.Size = new System.Drawing.Size(145, 54);
             this.button_Snapshot.TabIndex = 38;
             this.button_Snapshot.Text = "Snapshot";
             this.button_Snapshot.UseVisualStyleBackColor = true;
@@ -531,35 +556,39 @@
             // PIC_Arduino
             // 
             this.PIC_Arduino.Image = global::Cheese.ImageResource.BlackLED;
-            this.PIC_Arduino.Location = new System.Drawing.Point(11, 44);
+            this.PIC_Arduino.Location = new System.Drawing.Point(15, 55);
+            this.PIC_Arduino.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.PIC_Arduino.Name = "PIC_Arduino";
-            this.PIC_Arduino.Size = new System.Drawing.Size(20, 20);
+            this.PIC_Arduino.Size = new System.Drawing.Size(27, 25);
             this.PIC_Arduino.TabIndex = 29;
             this.PIC_Arduino.TabStop = false;
             // 
             // PIC_NetworkStatus
             // 
             this.PIC_NetworkStatus.Image = global::Cheese.ImageResource.BlackLED;
-            this.PIC_NetworkStatus.Location = new System.Drawing.Point(304, 43);
+            this.PIC_NetworkStatus.Location = new System.Drawing.Point(405, 54);
+            this.PIC_NetworkStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.PIC_NetworkStatus.Name = "PIC_NetworkStatus";
-            this.PIC_NetworkStatus.Size = new System.Drawing.Size(20, 20);
+            this.PIC_NetworkStatus.Size = new System.Drawing.Size(27, 25);
             this.PIC_NetworkStatus.TabIndex = 13;
             this.PIC_NetworkStatus.TabStop = false;
             // 
             // Picbox_CurrentStatus
             // 
-            this.Picbox_CurrentStatus.Location = new System.Drawing.Point(656, 574);
+            this.Picbox_CurrentStatus.Location = new System.Drawing.Point(875, 718);
+            this.Picbox_CurrentStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Picbox_CurrentStatus.Name = "Picbox_CurrentStatus";
-            this.Picbox_CurrentStatus.Size = new System.Drawing.Size(197, 49);
+            this.Picbox_CurrentStatus.Size = new System.Drawing.Size(263, 61);
             this.Picbox_CurrentStatus.TabIndex = 8;
             this.Picbox_CurrentStatus.TabStop = false;
             // 
             // PIC_ComPortStatus
             // 
             this.PIC_ComPortStatus.Image = global::Cheese.ImageResource.BlackLED;
-            this.PIC_ComPortStatus.Location = new System.Drawing.Point(153, 43);
+            this.PIC_ComPortStatus.Location = new System.Drawing.Point(204, 54);
+            this.PIC_ComPortStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.PIC_ComPortStatus.Name = "PIC_ComPortStatus";
-            this.PIC_ComPortStatus.Size = new System.Drawing.Size(20, 20);
+            this.PIC_ComPortStatus.Size = new System.Drawing.Size(27, 25);
             this.PIC_ComPortStatus.TabIndex = 5;
             this.PIC_ComPortStatus.TabStop = false;
             // 
@@ -567,9 +596,10 @@
             // 
             this.BTN_Stop.Enabled = false;
             this.BTN_Stop.Image = global::Cheese.ImageResource.stop;
-            this.BTN_Stop.Location = new System.Drawing.Point(1087, 583);
+            this.BTN_Stop.Location = new System.Drawing.Point(1449, 729);
+            this.BTN_Stop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.BTN_Stop.Name = "BTN_Stop";
-            this.BTN_Stop.Size = new System.Drawing.Size(95, 40);
+            this.BTN_Stop.Size = new System.Drawing.Size(127, 50);
             this.BTN_Stop.TabIndex = 4;
             this.BTN_Stop.UseVisualStyleBackColor = true;
             this.BTN_Stop.Visible = false;
@@ -579,9 +609,10 @@
             // 
             this.BTN_Pause.Enabled = false;
             this.BTN_Pause.Image = global::Cheese.ImageResource.pause_button;
-            this.BTN_Pause.Location = new System.Drawing.Point(986, 583);
+            this.BTN_Pause.Location = new System.Drawing.Point(1315, 729);
+            this.BTN_Pause.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.BTN_Pause.Name = "BTN_Pause";
-            this.BTN_Pause.Size = new System.Drawing.Size(95, 40);
+            this.BTN_Pause.Size = new System.Drawing.Size(127, 50);
             this.BTN_Pause.TabIndex = 3;
             this.BTN_Pause.UseVisualStyleBackColor = true;
             this.BTN_Pause.Click += new System.EventHandler(this.BTN_Pause_Click);
@@ -589,9 +620,10 @@
             // BTN_StartTest
             // 
             this.BTN_StartTest.Image = global::Cheese.ImageResource.play_button;
-            this.BTN_StartTest.Location = new System.Drawing.Point(885, 583);
+            this.BTN_StartTest.Location = new System.Drawing.Point(1180, 729);
+            this.BTN_StartTest.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.BTN_StartTest.Name = "BTN_StartTest";
-            this.BTN_StartTest.Size = new System.Drawing.Size(95, 40);
+            this.BTN_StartTest.Size = new System.Drawing.Size(127, 50);
             this.BTN_StartTest.TabIndex = 2;
             this.BTN_StartTest.UseVisualStyleBackColor = true;
             this.BTN_StartTest.Click += new System.EventHandler(this.BTN_StartTest_Click);
@@ -599,9 +631,10 @@
             // PIC_FTDI
             // 
             this.PIC_FTDI.Image = global::Cheese.ImageResource.BlackLED;
-            this.PIC_FTDI.Location = new System.Drawing.Point(454, 43);
+            this.PIC_FTDI.Location = new System.Drawing.Point(605, 54);
+            this.PIC_FTDI.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.PIC_FTDI.Name = "PIC_FTDI";
-            this.PIC_FTDI.Size = new System.Drawing.Size(20, 20);
+            this.PIC_FTDI.Size = new System.Drawing.Size(27, 25);
             this.PIC_FTDI.TabIndex = 40;
             this.PIC_FTDI.TabStop = false;
             // 
@@ -609,17 +642,18 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(473, 42);
+            this.label4.Location = new System.Drawing.Point(631, 52);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(85, 19);
+            this.label4.Size = new System.Drawing.Size(104, 24);
             this.label4.TabIndex = 39;
             this.label4.Text = "FTDI Status";
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1194, 692);
+            this.ClientSize = new System.Drawing.Size(1592, 865);
             this.Controls.Add(this.PIC_FTDI);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.button_Snapshot);
@@ -646,6 +680,8 @@
             this.Controls.Add(this.BTN_StartTest);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.panel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.Name = "Main";
             this.Text = "Cheese";

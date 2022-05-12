@@ -51,6 +51,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>cheese.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AForge">
       <HintPath>DLL\AForge.dll</HintPath>
@@ -198,7 +201,9 @@
     <None Include="Resources\pause.gif" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cheese.ico" />
     <Content Include="Image\save-file.png" />
+    <None Include="Image\tv-remote.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

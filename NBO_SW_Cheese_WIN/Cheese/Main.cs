@@ -78,7 +78,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.013";
+            this.VerLabel.Text = "Version: 00.00.014";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;

@@ -265,7 +265,7 @@ namespace ModuleLayer
         {
             log.Debug("XOR8_BytesWithChksum: " + original_data + ", " + BytesToBeWritten + ", " + BytesLength + ", " + withChksum);
             string[] hexValuesSplit = original_data.Split(' ');
-            byte XOR_value = new byte(), byteValue;
+            byte XOR_value = new byte(), byteValue = 0x00;
             int hex_number = 0;
             try
             {
@@ -276,6 +276,8 @@ namespace ModuleLayer
                         byteValue = Convert.ToByte(Convert.ToInt32(hex, 16));
                     else if (hex == "XX")
                         byteValue = 0x00;
+
+                    BytesToBeWritten[hex_number++] = byteValue;
 
                     if (hex_number > 0)
                         XOR_value = XOR(BytesToBeWritten[hex_number - 1], XOR_value);
