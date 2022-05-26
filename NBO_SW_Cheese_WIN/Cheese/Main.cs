@@ -34,7 +34,6 @@ namespace Cheese
         bool playState, pauseState, flagLoopTimes;
         //int FlagPause, FlagStop;
         int loopTimes = 0, loopRemaining = 0, loopRounds = 1, numInOneLoop;
-        int forLoopCount = 0;
         List<Tuple<int, int>> forLoopIndexList = new List<Tuple<int, int>>();
         static string Cmdsend, Cmdreceive;
         int Device, Resolution;
@@ -69,8 +68,6 @@ namespace Cheese
         string Read_Arduino_Data = "";
         bool serial_receive = false;
         int GPIO_Read_Data = 0x0000;
-        // ----------------------------------------------------------------------------------------------- //
-        static int cmdVarStep = 0;
 
         public Main()
         {
@@ -78,7 +75,7 @@ namespace Cheese
             InitializeComponent();
             tempDataGrid = this.dataGridView1;
             FlagComPortStauts = 0;
-            this.VerLabel.Text = "Version: 00.00.014";
+            this.VerLabel.Text = "Version: 00.00.015";
             playState = false;
             pauseState = false;
             flagLoopTimes = false;
@@ -486,8 +483,9 @@ namespace Cheese
             byte[] retBuf = new byte[100];
             byte[] finBuf = new byte[100];
             ushort arduino_input_status;
-            int delayTime, RowCount, ExeIndex = 0, forLoopItem = 0, cmdVar_int = -1;
-            
+            int delayTime, RowCount, ExeIndex = 0;
+            int forLoopCount = 0, forIndexStart = 0, forLoopItem = 0, forLoopVar = -1, forLoopVarStep = 0;
+
             RowCount = this.dataGridView1.Rows.Count;
             if (RowCount <= 1) 
             {
@@ -511,6 +509,7 @@ namespace Cheese
                 {
                     //GlobalData.caption_Num = 0;
                     numInOneLoop = 1;
+                    forLoopItem = 0;
                     Invoke(UpdateUIBtn, 3, 1);  //display testing
                     // ============= Clear old data ============= //
                     for (ExeIndex = 0; ExeIndex < (RowCount-1); ExeIndex++)
@@ -1698,15 +1697,10 @@ namespace Cheese
                                 if (columns_function == "Write" && columns_cmdLine != "")
                                 {
                                     //log.Debug("FTDI Write Log: _FTDI_Write");
+                                    if (forLoopVar >= 0 && columns_cmdLine.Contains("XX"))
+                                        CombineCmdline(ref columns_cmdLine, forIndexStart);
+
                                     int packetLen = columns_cmdLine.Split(' ').Count();
-
-                                    if (cmdVar_int >= 0 && columns_cmdLine.Contains("XX"))
-                                    {
-                                        string cmdVariable = cmdVarStep.ToString("X2").PadLeft(2, '0');
-                                        string columns_cmdLine_subPart = columns_cmdLine.Substring(0, columns_cmdLine.Length - 2);
-                                        columns_cmdLine = columns_cmdLine_subPart + cmdVariable;
-                                    }
-
                                     byte[] cmdBytes = new byte[packetLen + 1];     //Plus 1 is reserved for checksum Byte
                                     var tstStr = dataConv.XOR8_BytesWithChksum(columns_cmdLine, cmdBytes, cmdBytes.Length);
                                     
@@ -1716,7 +1710,7 @@ namespace Cheese
 									
                                     FtResult writeResult = GlobalData.Ftdi_lib.I2C_SEQ_Write(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData);
                                     columns_cmdLine += " " + tstStr;
-
+                                    Invoke(WriteDataGrid, 11, ExeIndex, forIndexStart.ToString());
                                     log.Info($"[{columns_remark}]_{columns_cmdLine}_");
                                     log.Info($"[==>Write Result] {(FtResult)writeResult}");
                                     Invoke(WriteDataGrid, 10, ExeIndex, writeResult.ToString());
@@ -1725,6 +1719,10 @@ namespace Cheese
                                 else if (columns_function == "Read" && columns_cmdLine != "")
                                 {
                                     //log.Debug("FTDI Write Log: _FTDI_Read");
+                                    if (forLoopVar >= 0 && columns_cmdLine.Contains("XX"))
+                                        CombineCmdline(ref columns_cmdLine, forIndexStart);
+                                    Invoke(WriteDataGrid, 11, ExeIndex, forIndexStart.ToString());
+
                                     string dataContent = "";
                                     int packetLen = columns_cmdLine.Split(' ').Count();
                                     byte recLength = 0x00;
@@ -1750,7 +1748,6 @@ namespace Cheese
                                     if (GlobalData.Ftdi_lib.I2C_SEQ_Read(GlobalData.portinfo.ftHandle, DeviceAddr, DeviceData, readBytes, out recLength) == FtResult.Ok)
                                     {
                                         // Below part is used to print data content with raw data and ascii data formats
-                                        //string dataContent = "";
                                         resultLine = "";
                                         DeviceAddr = 0x50;
                                         string ascii_replyData = dataConv.XOR8_FtdiDataParsing(ref resultLine, ref dataContent, cmdBytes, readBytes, ref DeviceAddr, recLength);
@@ -1797,6 +1794,8 @@ namespace Cheese
                                     strOutput = e.Message;
                                 }
                             }
+
+                            Thread.Sleep(Convert.ToInt32(this.dataGridView1.Rows[ExeIndex].Cells[8].Value));
                         }
                         #endregion
                         #region -- FOR Loop --
@@ -1812,17 +1811,26 @@ namespace Cheese
                                         if (columns_times != "")
                                         {
                                             forLoopCount = Convert.ToInt32(columns_times);
-                                            // ...... FOR Loop Write Index Byte is ready to start a local loop ...... //
-                                            if (columns_interval != "" && columns_cmdLine != "")
+                                            // ...... FOR Loop accompanies with FTDI/DDCCI/RS232 purpose ...... //
+                                            if (columns_interval != "" && columns_subFunction != "" && columns_cmdLine == "XX")
                                             {
-                                                cmdVar_int = forLoopCount;
-                                                cmdVarStep = Convert.ToInt32(columns_interval);
+                                                forLoopVar = forLoopCount;
+                                                forIndexStart = Convert.ToInt32(columns_subFunction);   //forLoopVar initial value
+                                                forLoopVarStep = Convert.ToInt32(columns_interval);   //each step value of forLoopVar
+                                            }
+                                            if (columns_interval != "" && columns_subFunction != "" && columns_cmdLine == "")
+                                            {
+                                                forIndexStart = Convert.ToInt32(columns_subFunction);
+                                                forLoopVarStep = Convert.ToInt32(columns_interval);
                                             }
                                         }
                                         else
+                                        {
                                             forLoopCount = 1;
+                                            forLoopVarStep = 1;
+                                        }
 
-                                        forLoopItem++;  //go to end row
+                                        forLoopItem++;  //go to FOR Loop end row
                                     }
 
                                     if (forLoopIndexList.ElementAt(forLoopItem).Item1 % 2 == 1 && ExeIndex == forLoopIndexList.ElementAt(forLoopItem).Item2)
@@ -1834,8 +1842,9 @@ namespace Cheese
                                             Invoke(updateDataGrid, ExeIndex, -5, "");   //unselect forLoopEnd row
                                             ExeIndex = forLoopIndexList.ElementAt(forLoopItem - 1).Item2;    //go back to start row
                                             // ...... FOR Loop Write Index Byte is going a local loop ...... //
-                                            cmdVar_int--;
-                                            cmdVarStep++;
+                                            forLoopVar--;
+                                            //cmdVarStep++;
+                                            forIndexStart += forLoopVarStep;
                                             log.Info("FOR Loop - Row " + ExeIndex.ToString() + " remaining " + forLoopCount.ToString());
                                         }
                                         else if (forLoopCount == 1)
@@ -1843,8 +1852,9 @@ namespace Cheese
                                             forLoopCount--;
                                             forLoopItem++;  //go to next start row
                                             // ...... FOR Loop Write Index Byte is resumed as initial ...... //
-                                            cmdVar_int = -1;
-                                            //cmdVarStep = 0;
+                                            forLoopVar = 0;
+                                            forIndexStart = 0;
+                                            forLoopVarStep = 0;
                                         }
                                     }
                                 }
@@ -2650,6 +2660,7 @@ namespace Cheese
                 }
             }
         }
+		
         private void SerialPort_Cmd_Handling()
         {
                 /*while (playState)
@@ -3025,6 +3036,20 @@ namespace Cheese
             //loopTimes = valueOfLoop;
             loopRemaining = valueOfLoop;
             loopRounds = 1;
+        }
+
+        private void CombineCmdline(ref string columns_cmdLine, int forIdxStart)
+        {
+            string cmdVariable = "", columns_cmdLine_subPart = "", columns_cmdLine_lastPart = "";
+            int idxOfXX = columns_cmdLine.IndexOf("XX");
+            int lenOfAll = columns_cmdLine.Length;
+            cmdVariable = forIdxStart.ToString("X2").PadLeft(2, '0');
+
+            columns_cmdLine_subPart = columns_cmdLine.Substring(0, idxOfXX);
+            if (lenOfAll - 2 > idxOfXX)
+                columns_cmdLine_lastPart = columns_cmdLine.Substring(idxOfXX + 2, lenOfAll - idxOfXX - 2);
+
+            columns_cmdLine = columns_cmdLine_subPart + cmdVariable + columns_cmdLine_lastPart;
         }
 
         private void button_Camera_Click(object sender, EventArgs e)
