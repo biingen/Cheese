@@ -332,8 +332,8 @@ namespace ModuleLayer
 
                 if (tmpArray[arraySize - 1] == returnBytes[arraySize - 1])
                 {
-                    if (returnBytes[4] == cmdLineBytes[4] && returnBytes[5] == 0)   //cmdLineBytes[4]: sub-cmd && cmdLineBytes[5]: op code
-                    {
+                    if (returnBytes[4] == cmdLineBytes[4] && cmdLineBytes[4] > 0xDF && returnBytes[6] == cmdLineBytes[5])
+                    {   //cmdLineBytes[4]: vcpCode && cmdLineBytes[5]: sub-cmd && cmdLineBytes[6]: opCode
                         int num = 0;
 
                         for (int j = 7; j < arraySize - 1; j++)
@@ -349,7 +349,25 @@ namespace ModuleLayer
                         Array.Copy(tmpArray, tmpByte, num);
                         content_data_ascii = Encoding.ASCII.GetString(tmpByte);
                     }
-                    else if (returnBytes[4] == cmdLineBytes[4] && returnBytes[4] != 0)   //readBytes[5]: reply result
+                    else if ((returnBytes[4] == cmdLineBytes[4] && cmdLineBytes[4] <= 0xDF) ||
+                             (returnBytes[4] == cmdLineBytes[4] && cmdLineBytes[4] > 0xDF && cmdLineBytes[2] == 0x82 && returnBytes[6] == cmdLineBytes[5]))
+                    {   //such case is for VESA VCP or for i2c without Sub-cmd byte
+                        int num = 0;
+
+                        for (int j = 6; j < arraySize - 1; j++)
+                        {
+                            if (j < arraySize - 2)
+                                content_data += ((int)returnBytes[j]).ToString("X2").PadLeft(2, '0') + " ";
+                            else if (j == arraySize - 2)
+                                content_data += ((int)returnBytes[j]).ToString("X2").PadLeft(2, '0');
+
+                            tmpArray[num++] = returnBytes[j];
+                        }
+                        byte[] tmpByte = new byte[num];
+                        Array.Copy(tmpArray, tmpByte, num);
+                        content_data_ascii = Encoding.ASCII.GetString(tmpByte);
+                    }
+                    else
                     {
                         content_data = "Reply with Error!";
                         content_data_ascii = content_data;
